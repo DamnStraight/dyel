@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:icon="@drawable/ic_person"
+        android:title="@string/nav_profile"
+        app:labelVisibilityMode="labeled" />
+    <item
+        android:icon="@drawable/ic_event_note"
+        android:title="@string/nav_history"
+        app:labelVisibilityMode="labeled" />
+    <item
+        android:enabled="false"
+        android:title=""
+        app:showAsAction="always" />
+    <item
+        android:icon="@drawable/ic_fitness_center"
+        android:title="@string/nav_exercises"
+        app:labelVisibilityMode="labeled" />
+
+    <item
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings"
+        app:labelVisibilityMode="labeled" />
+</menu>
