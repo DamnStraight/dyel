@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { RootTabParamList } from "@Root/Navigation";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootExerciseStackParamList } from "@Root/Navigation";
 import {
   Box,
   Fab,
@@ -11,8 +11,7 @@ import {
   Text,
   View
 } from "native-base";
-
-interface ExerciseProps extends BottomTabScreenProps<RootTabParamList, "Exercises"> {}
+import { StyleSheet } from "react-native";
 
 function ExerciseCard() {
   return (
@@ -31,14 +30,20 @@ function ExerciseCard() {
   );
 }
 
-function ExerciseScreen({ navigation }: ExerciseProps) {
+// ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
+
+interface ExerciseProps extends NativeStackScreenProps<RootExerciseStackParamList, "ExerciseScreen"> {}
+
+export default function ExerciseScreen({ navigation }: ExerciseProps) {
   return (
     <Box safeAreaTop>
       <Box>
         <ScrollView w="full" h="full">
           <View p="4">
             <Stack w="full" space="4">
-              <Heading size="4xl">Exercises</Heading>
+              <Heading size="4xl" style={styles.header}>
+                Exercises
+              </Heading>
               <ExerciseCard />
               <ExerciseCard />
               <ExerciseCard />
@@ -61,15 +66,23 @@ function ExerciseScreen({ navigation }: ExerciseProps) {
       <Fab
         onPress={() => navigation.navigate("AddExerciseModal")}
         renderInPortal={false}
-        shadow={2}
+        shadow={4}
         size="lg"
         w="75"
         h="75"
-        icon={<Icon as={FontAwesome5} name="plus" />}
+        icon={<Icon as={FontAwesome5} name="plus" size="xl" ml="1" />}
         backgroundColor="violet.700"
       />
     </Box>
   );
 }
 
-export default ExerciseScreen;
+// ─── Styles ────────────────────────────────────────────────────────────── ✣ ─
+
+const styles = StyleSheet.create({
+  header: {
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+});

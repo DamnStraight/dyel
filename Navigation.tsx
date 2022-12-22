@@ -48,7 +48,7 @@ function ExerciseStackNavigation() {
   );
 }
 
-// ─── Navigation ────────────────────────────────────────────────────────── ✣ ─
+// ─── Root Navigation ───────────────────────────────────────────────────── ✣ ─
 
 export type RootTabParamList = {
   Dashboard       : undefined;
