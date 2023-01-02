@@ -37,32 +37,30 @@ interface ExerciseProps extends NativeStackScreenProps<RootExerciseStackParamLis
 export default function ExerciseScreen({ navigation }: ExerciseProps) {
   return (
     <Box safeAreaTop>
-      <Box>
-        <ScrollView w="full" h="full">
-          <View p="4">
-            <Stack w="full" space="4">
-              <Heading size="4xl" style={styles.header}>
-                Exercises
-              </Heading>
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-              <ExerciseCard />
-            </Stack>
-          </View>
-        </ScrollView>
-      </Box>
+      <ScrollView w="full" h="full">
+        <View p="4">
+          <Stack w="full" space="4">
+            <Heading size="4xl" style={styles.header}>
+              Exercises
+            </Heading>
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+            <ExerciseCard />
+          </Stack>
+        </View>
+      </ScrollView>
       <Fab
         onPress={() => navigation.navigate("AddExerciseModal")}
         renderInPortal={false}
