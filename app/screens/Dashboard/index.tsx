@@ -17,9 +17,11 @@ function DashboardScreen() {
           <VStack space={4}>
             <Box>
               <Heading size="2xl" style={styles.textShadowLarge}>
+                {/* TODO Make this based on the time of day (Good monring, good afternoon, good evening) */}
                 Good Morning,
               </Heading>
               <Heading size="3xl" style={styles.textShadowLarge}>
+                {/* Allow user to enter name in settings personalization */}
                 Steven
               </Heading>
             </Box>
@@ -40,17 +42,34 @@ function DashboardScreen() {
                       <Heading size="sm" style={styles.textShadowSmall}>
                         2022-12-29 - Chest Day
                       </Heading>
-                      <Text style={styles.textShadowSmall}>Bla bla text might go here, like if you did something notable like hit a new PR lift</Text>
+                      <Text style={styles.textShadowSmall}>
+                        Bla bla text might go here, like if you did something
+                        notable like hit a new PR lift
+                      </Text>
                     </VStack>
                   </Box>
                 );
               }}
             </Pressable>
             <HStack space="4">
-              <Box w="48%" h="40" bg="violet.200" rounded="lg" p="4" shadow="lg">
+              <Box
+                w="48%"
+                h="40"
+                bg="violet.200"
+                rounded="lg"
+                p="4"
+                shadow="lg"
+              >
                 <Heading color="gray.800">Settings</Heading>
               </Box>
-              <Box w="48%" h="40" bg="violet.200" rounded="lg" p="4" shadow="lg">
+              <Box
+                w="48%"
+                h="40"
+                bg="violet.200"
+                rounded="lg"
+                p="4"
+                shadow="lg"
+              >
                 <Heading color="gray.800">Temp</Heading>
               </Box>
             </HStack>
