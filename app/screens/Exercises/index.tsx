@@ -1,3 +1,5 @@
+import { ExerciseModel } from "@App/data/entities/Exercise";
+import { useDatabase } from "@App/hooks/useDatabase";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootExerciseStackParamList } from "@Root/Navigation";
@@ -9,12 +11,10 @@ import {
   ScrollView,
   Stack,
   Text,
-  View,
+  View
 } from "native-base";
-import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
-import { ExerciseModel } from "../../data/entities/Exercise";
-import { useDatabase } from "../../hooks/useDatabase";
+import { useCallback, useEffect, useState } from "react";
+import { RefreshControl, StyleSheet } from "react-native";
 
 function ExerciseCard({ name }: { name: string }) {
   return (
@@ -34,24 +34,39 @@ function ExerciseCard({ name }: { name: string }) {
 }
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
-
-interface ExerciseProps
-  extends NativeStackScreenProps<
-    RootExerciseStackParamList,
-    "ExerciseScreen"
-  > {}
+// prettier-ignore
+interface ExerciseProps extends NativeStackScreenProps<RootExerciseStackParamList, "ExerciseScreen"> {}
 
 export default function ExerciseScreen({ navigation }: ExerciseProps) {
   const { exerciseRepository } = useDatabase();
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
+  const [isRefreshing, setRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
-    exerciseRepository.getAll().then(setExercises);
+    // Refresh the exercise list whenever the screen comes back into focus
+    const unsubscribe = navigation.addListener("focus", () => {
+      exerciseRepository.getAll().then(setExercises);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    const result = await exerciseRepository.getAll();
+    setExercises(result);
+    setRefreshing(false);
   }, []);
 
   return (
     <Box safeAreaTop>
-      <ScrollView w="full" h="full">
+      <ScrollView
+        w="full"
+        h="full"
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+        }
+      >
         <View p="4">
           <Stack w="full" space="4">
             <Heading size="4xl" style={styles.header}>

@@ -3,7 +3,7 @@ import React, {
   ReactNode,
   useCallback,
   useEffect,
-  useState,
+  useState
 } from "react";
 import { ActivityIndicator } from "react-native";
 import { DataSource } from "typeorm";
@@ -30,6 +30,7 @@ export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({
       driver: require("expo-sqlite"),
       entities: [ExerciseModel],
       synchronize: true,
+      dropSchema: true
     });
 
     await AppDataSource.initialize();

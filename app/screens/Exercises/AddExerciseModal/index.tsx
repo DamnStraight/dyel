@@ -1,3 +1,4 @@
+import { useDatabase } from "@App/hooks/useDatabase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RootTabParamList } from "@Root/Navigation";
@@ -12,7 +13,6 @@ import {
 } from "native-base";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { useDatabase } from "../../../hooks/useDatabase";
 
 // ─── Form ──────────────────────────────────────────────────────────────── ✣ ─
 
@@ -27,11 +27,8 @@ const defaultValues: Readonly<FormData> = {
 };
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
-
-type AddExerciseModalProps = BottomTabScreenProps<
-  RootTabParamList,
-  "AddExerciseModal"
-> & {};
+// prettier-ignore
+type AddExerciseModalProps = BottomTabScreenProps<RootTabParamList, "AddExerciseModal"> & {};
 
 export default function AddExercise({ navigation }: AddExerciseModalProps) {
   const { exerciseRepository } = useDatabase();
@@ -46,8 +43,8 @@ export default function AddExercise({ navigation }: AddExerciseModalProps) {
   });
 
   const onSubmit = async (data: FormData) => {
-    const result = await exerciseRepository.create(data.name);
-    console.log(result);
+    await exerciseRepository.create(data.name);
+    navigation.goBack();
   };
 
   return (
