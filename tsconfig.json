@@ -5,7 +5,10 @@
     "paths": {
       "@App/*": ["app/*"],
       "@Root/*": ["./*"]
-    }
+    },
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false
   },
   "extends": "expo/tsconfig.base",
 }

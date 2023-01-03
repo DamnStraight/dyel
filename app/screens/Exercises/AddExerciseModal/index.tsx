@@ -7,10 +7,12 @@ import {
   FormControl,
   Heading,
   Input,
-  Stack, WarningOutlineIcon
+  Stack,
+  WarningOutlineIcon,
 } from "native-base";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { useDatabase } from "../../../hooks/useDatabase";
 
 // ─── Form ──────────────────────────────────────────────────────────────── ✣ ─
 
@@ -26,9 +28,14 @@ const defaultValues: Readonly<FormData> = {
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 
-type AddExerciseModalProps = BottomTabScreenProps<RootTabParamList, "AddExerciseModal"> & {}
+type AddExerciseModalProps = BottomTabScreenProps<
+  RootTabParamList,
+  "AddExerciseModal"
+> & {};
 
 export default function AddExercise({ navigation }: AddExerciseModalProps) {
+  const { exerciseRepository } = useDatabase();
+
   const {
     control,
     handleSubmit,
@@ -38,13 +45,23 @@ export default function AddExercise({ navigation }: AddExerciseModalProps) {
     defaultValues,
   });
 
-  const onSubmit = (data: FormData) => console.log(data);
+  const onSubmit = async (data: FormData) => {
+    const result = await exerciseRepository.create(data.name);
+    console.log(result);
+  };
 
   return (
     <Box safeAreaTop>
       <Stack p="4" space="4">
         <Heading size="3xl">Add Exercise</Heading>
-        <Box backgroundColor="gray.700" pt="4" pb="6" px="4" rounded="lg" shadow="2">
+        <Box
+          backgroundColor="gray.700"
+          pt="4"
+          pb="6"
+          px="4"
+          rounded="lg"
+          shadow="2"
+        >
           <FormControl isInvalid={!!errors.name}>
             <FormControl.Label _text={{ bold: true, fontSize: "lg" }}>
               Exercise Name

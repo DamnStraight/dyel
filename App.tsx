@@ -1,8 +1,7 @@
-import {
-  extendTheme,
-  NativeBaseProvider, useColorMode
-} from "native-base";
+import "reflect-metadata";
+import { extendTheme, NativeBaseProvider, useColorMode } from "native-base";
 import RootNavigation from "./Navigation";
+import { DatabaseConnectionProvider } from "./app/context/DatabaseConnectionContext";
 
 const config = {
   useSystemColorMode: false,
@@ -18,7 +17,9 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={customTheme}>
-      <RootNavigation />
+      <DatabaseConnectionProvider>
+        <RootNavigation />
+      </DatabaseConnectionProvider>
     </NativeBaseProvider>
   );
 }

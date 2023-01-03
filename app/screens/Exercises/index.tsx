@@ -9,11 +9,14 @@ import {
   ScrollView,
   Stack,
   Text,
-  View
+  View,
 } from "native-base";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import { ExerciseModel } from "../../data/entities/Exercise";
+import { useDatabase } from "../../hooks/useDatabase";
 
-function ExerciseCard() {
+function ExerciseCard({ name }: { name: string }) {
   return (
     <Box
       w="full"
@@ -23,7 +26,7 @@ function ExerciseCard() {
       shadow="2"
     >
       <Stack>
-        <Heading size="md">Bench Press</Heading>
+        <Heading size="md">{name}</Heading>
         <Text>Sample description blabla</Text>
       </Stack>
     </Box>
@@ -32,9 +35,20 @@ function ExerciseCard() {
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 
-interface ExerciseProps extends NativeStackScreenProps<RootExerciseStackParamList, "ExerciseScreen"> {}
+interface ExerciseProps
+  extends NativeStackScreenProps<
+    RootExerciseStackParamList,
+    "ExerciseScreen"
+  > {}
 
 export default function ExerciseScreen({ navigation }: ExerciseProps) {
+  const { exerciseRepository } = useDatabase();
+  const [exercises, setExercises] = useState<ExerciseModel[]>([]);
+
+  useEffect(() => {
+    exerciseRepository.getAll().then(setExercises);
+  }, []);
+
   return (
     <Box safeAreaTop>
       <ScrollView w="full" h="full">
@@ -43,21 +57,9 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
             <Heading size="4xl" style={styles.header}>
               Exercises
             </Heading>
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
+            {exercises.map(({ name }, i) => (
+              <ExerciseCard key={`${i}-${name}`} name={name} />
+            ))}
           </Stack>
         </View>
       </ScrollView>
