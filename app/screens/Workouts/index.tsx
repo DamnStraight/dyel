@@ -1,15 +1,15 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootTabParamList } from "@Root/Navigation";
+import { RootTabParamList, RootWorkoutStackParamList } from "@Root/Navigation";
 import { Box, Fab, Heading, Icon, ScrollView, Stack, View } from "native-base";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, StyleSheet } from "react-native";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
-interface WorkoutProps extends NativeStackScreenProps<RootTabParamList, "Workouts"> {}
+interface WorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList, "WorkoutScreen"> {}
 
-function WorkoutsScreen({ navigation }: WorkoutProps) {
+function WorkoutScreen({ navigation }: WorkoutProps) {
   const [workouts, setWorkouts] = useState<any[]>([]);
   const [isRefreshing, setRefreshing] = useState<boolean>(false);
 
@@ -43,14 +43,14 @@ function WorkoutsScreen({ navigation }: WorkoutProps) {
             <Heading size="4xl" style={styles.header}>
               Workouts
             </Heading>
-            {workouts.map(({ name }, i) => (
+            {/* {workouts.map(({ name }, i) => (
               <ExerciseCard key={`${i}-${name}`} name={name} />
-            ))}
+            ))} */}
           </Stack>
         </View>
       </ScrollView>
       <Fab
-        onPress={() => navigation.navigate("AddExerciseModal")}
+        onPress={() => navigation.navigate("AddWorkoutModal")}
         renderInPortal={false}
         shadow={4}
         size="lg"
@@ -63,7 +63,7 @@ function WorkoutsScreen({ navigation }: WorkoutProps) {
   );
 }
 
-export default WorkoutsScreen;
+export default WorkoutScreen;
 
 // ─── Styles ────────────────────────────────────────────────────────────── ✣ ─
 

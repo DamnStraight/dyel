@@ -72,6 +72,7 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
             <Heading size="4xl" style={styles.header}>
               Exercises
             </Heading>
+            {/* FIXME Use flatlist */}
             {exercises.map(({ name }, i) => (
               <ExerciseCard key={`${i}-${name}`} name={name} />
             ))}

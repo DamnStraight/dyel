@@ -6,16 +6,17 @@ import DashboardScreen from "@App/screens/Dashboard";
 import ExerciseScreen from "@App/screens/Exercises";
 import AddExerciseModal from "@App/screens/Exercises/AddExerciseModal";
 import HistoryScreen from "@App/screens/History";
-import WorkoutsScreen from "@App/screens/Workouts";
+import WorkoutScreen from "@App/screens/Workouts";
+import AddWorkoutModal from "@App/screens/Workouts/AddWorkoutModal/AddWorkoutModal";
 
 const NavigationTheme = {
   ...DefaultTheme,
   colors: {
-    primary     : "white",
-    background  : "#27272a",
-    card        : "#18181b",
-    text        : "#fafafa",
-    border      : "#3f3f46",
+    primary: "white",
+    background: "#27272a",
+    card: "#18181b",
+    text: "#fafafa",
+    border: "#3f3f46",
     notification: "rgb(255, 69, 58)",
   },
 };
@@ -23,9 +24,9 @@ const NavigationTheme = {
 // ─── Exercise Navigation ───────────────────────────────────────────────── ✣ ─
 
 export type RootExerciseStackParamList = {
-  ExerciseScreen  : undefined;
+  ExerciseScreen: undefined;
   AddExerciseModal: undefined;
-}
+};
 
 const ExerciseStack = createNativeStackNavigator<RootExerciseStackParamList>();
 
@@ -38,7 +39,8 @@ function ExerciseStackNavigation() {
           component={ExerciseScreen}
         />
       </ExerciseStack.Group>
-      <ExerciseStack.Group screenOptions={{ presentation: "modal" }}>
+      <ExerciseStack.Group>
+        {/* <ExerciseStack.Group screenOptions={{ presentation: "fullScreenModal" }}> */}
         <ExerciseStack.Screen
           name="AddExerciseModal"
           component={AddExerciseModal}
@@ -48,13 +50,39 @@ function ExerciseStackNavigation() {
   );
 }
 
+// ─── Workout Navigation ───────────────────────────────────────────────── ✣ ─
+
+export type RootWorkoutStackParamList = {
+  WorkoutScreen: undefined;
+  AddWorkoutModal: undefined;
+};
+
+const WorkoutStack = createNativeStackNavigator<RootWorkoutStackParamList>();
+
+function WorkoutStackNavigation() {
+  return (
+    <WorkoutStack.Navigator>
+      <WorkoutStack.Group screenOptions={{ headerShown: false }}>
+        <WorkoutStack.Screen name="WorkoutScreen" component={WorkoutScreen} />
+      </WorkoutStack.Group>
+      <WorkoutStack.Group>
+        {/* <WorkoutStack.Group screenOptions={{ presentation: "fullScreenModal" }}> */}
+        <WorkoutStack.Screen
+          name="AddWorkoutModal"
+          component={AddWorkoutModal}
+        />
+      </WorkoutStack.Group>
+    </WorkoutStack.Navigator>
+  );
+}
+
 // ─── Root Navigation ───────────────────────────────────────────────────── ✣ ─
 
 export type RootTabParamList = {
-  Dashboard       : undefined;
-  Exercises       : undefined;
-  Workouts        : undefined;
-  History         : undefined;
+  Dashboard: undefined;
+  Exercises: undefined;
+  Workouts: undefined;
+  History: undefined;
   AddExerciseModal: undefined;
 };
 
@@ -92,7 +120,7 @@ export default function RootNavigation() {
               ),
             }}
             name="Workouts"
-            component={WorkoutsScreen}
+            component={WorkoutStackNavigation}
           />
           <RootTab.Screen
             options={{

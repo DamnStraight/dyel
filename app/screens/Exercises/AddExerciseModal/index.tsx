@@ -70,6 +70,7 @@ export default function AddExercise({ navigation }: AddExerciseModalProps) {
               rules={{ required: true }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
+                  autoFocus
                   size="2xl"
                   h="12"
                   placeholder="Name"
