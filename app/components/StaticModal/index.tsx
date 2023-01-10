@@ -1,12 +1,12 @@
 import { Box, IBoxProps, Modal, usePropsResolution, View } from "native-base";
-import React from "react";
 import { IModalComponentType } from "native-base/lib/typescript/components/composites/Modal/types";
+import React from "react";
 
 /**
- * Modal.Body that uses a View wrapper instead of the ScrollView the default
- * Native-base Model.Body does. 
+ * Modal.Body that uses a View wrapper instead of the ScrollView the default Native-base Model.Body does. 
  * 
- * Allows the use of FlatList as Model.Body content
+ * Allows the use of FlatList inside of Modals without throwing warnings for
+ * nested scroll views
  * 
  * @returns 
  */

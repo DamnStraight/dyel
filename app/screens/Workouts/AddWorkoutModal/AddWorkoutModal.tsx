@@ -20,7 +20,8 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-import ExercisePicker from "../../../components/ExercisePicker";
+import ExercisePicker from "@App/components/ExercisePicker";
+import { ExerciseModel } from "@App/data/entities/Exercise";
 
 // ─── Form ──────────────────────────────────────────────────────────────── ✣ ─
 
@@ -38,9 +39,16 @@ const defaultValues: Readonly<FormData> = {
 // prettier-ignore
 interface AddWorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList, "AddWorkoutModal"> {}
 
+interface Workout {}
+
 function AddWorkoutModal() {
-  const [workoutItems, setWorkoutItems] = useState<any>();
+  const [workoutItems, setWorkoutItems] = useState<ExerciseModel[]>([]);
   const [showModal, setShowModal] = useState(false);
+
+  const addExerciseHandler = (exercise: ExerciseModel) => {
+    setWorkoutItems([...workoutItems, exercise]);
+    setShowModal(false);
+  };
 
   return (
     <Box>
@@ -50,23 +58,9 @@ function AddWorkoutModal() {
             <Heading size="3xl" style={styles.header}>
               Create Workout
             </Heading>
-            <FormControl isRequired isInvalid>
+            <FormControl isRequired>
               <FormControl.Label>Workout Name</FormControl.Label>
               <Input placeholder="Leg Day" size="xl" />
-              <FormControl.ErrorMessage
-                leftIcon={<WarningOutlineIcon size="xs" />}
-              >
-                That workout name already exists!
-              </FormControl.ErrorMessage>
-            </FormControl>
-            <FormControl>
-              <FormControl.Label>Description</FormControl.Label>
-              <TextArea
-                h={20}
-                placeholder="Leg Day"
-                autoCompleteType={undefined}
-                size="xl"
-              />
               <FormControl.ErrorMessage
                 leftIcon={<WarningOutlineIcon size="xs" />}
               >
@@ -81,14 +75,20 @@ function AddWorkoutModal() {
             >
               Add Exercise
             </Button>
+            {workoutItems.map((item, index) => (
+              <Box key={index}>
+                <Heading>{item.name}</Heading>
+              </Box>
+            ))}
           </Stack>
         </View>
       </ScrollView>
-      <ExercisePicker
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSubmit={(exercise) => console.log(exercise)}
-      />
+      {showModal && (
+        <ExercisePicker
+          onClose={() => setShowModal(false)}
+          onSubmit={addExerciseHandler}
+        />
+      )}
     </Box>
   );
 }

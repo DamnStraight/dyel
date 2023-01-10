@@ -1,3 +1,6 @@
+import AppDataSource from "@App/data/AppDataSource";
+import { ExerciseRepository } from "@App/data/repositories/ExerciseRepository";
+import { Box, Center, Heading, Spinner } from "native-base";
 import React, {
   createContext,
   ReactNode,
@@ -5,52 +8,54 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { ActivityIndicator } from "react-native";
-import { DataSource } from "typeorm";
-import { ExerciseModel } from "../data/entities/Exercise";
-import { ExerciseRepository } from "../data/repositories/ExerciseRepository";
 
 interface DatabaseConnectionContextRepos {
   exerciseRepository: ExerciseRepository;
 }
 
-export const DatabaseConnectionContext = createContext<DatabaseConnectionContextRepos>(
+// prettier-ignore
+export const DatabaseConnectionContext = createContext<DatabaseConnectionContextRepos> (
   {} as DatabaseConnectionContextRepos
 );
 
-export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [dataSource, setDataSource] = useState<DataSource | null>(null);
+// TODO Remove this when simulating loading is no longer necessary
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-  const createDataSource = useCallback(async () => {
-    const AppDataSource = new DataSource({
-      type: "expo",
-      database: "dyel.db",
-      driver: require("expo-sqlite"),
-      entities: [ExerciseModel],
-      synchronize: true,
-      dropSchema: true
-    });
+// Make sure the typeorm datasource is fully loaded before providing the context
+// prettier-ignore
+export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({ children, }) => {
+  const [isInitialized, setInitialized] = useState<boolean>(false);
 
+  const initializeDataSource = useCallback(async () => {
     await AppDataSource.initialize();
-
-    setDataSource(AppDataSource);
+    await delay(4000);
+    setInitialized(true);
   }, []);
 
   useEffect(() => {
-    if (!dataSource) {
-      createDataSource();
+    if (!isInitialized) {
+      initializeDataSource();
     }
-  }, [createDataSource, dataSource]);
+  }, [initializeDataSource, isInitialized]);
 
-  if (!dataSource) {
-    return <ActivityIndicator />;
+  if (!isInitialized) {
+    return (
+      <Box h="full" w="full" bg="gray.800" safeAreaTop>
+        <Center h="full">
+          <Spinner size="lg" color="violet.500" />
+          <Heading size="3xl" color="violet.500">
+            Loading
+          </Heading>
+        </Center>
+      </Box>
+    );
   }
 
   return (
     <DatabaseConnectionContext.Provider
-      value={{ exerciseRepository: new ExerciseRepository(dataSource) }}
+      value={{ exerciseRepository: new ExerciseRepository(AppDataSource) }}
     >
       {children}
     </DatabaseConnectionContext.Provider>

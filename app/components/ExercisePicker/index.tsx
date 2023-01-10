@@ -1,3 +1,4 @@
+import { StaticModal as Modal } from "@App/components/StaticModal";
 import { ExerciseModel } from "@App/data/entities/Exercise";
 import { useDatabase } from "@App/hooks/useDatabase";
 import {
@@ -5,27 +6,23 @@ import {
   Button,
   Center,
   FlatList,
-  Heading,
-  Spinner,
+  Heading, Pressable, Spinner,
   Stack,
-  Text,
+  Text
 } from "native-base";
 import { useEffect, useState } from "react";
 import { ListRenderItem } from "react-native";
-import { StaticModal as Modal } from "../StaticModal";
 
 type ExercisePickerProps = {
   onSubmit: (exercise: ExerciseModel) => void;
   onClose: () => void;
-  isOpen: boolean;
 };
 
-function ExercisePicker({ onClose, onSubmit, isOpen }: ExercisePickerProps) {
+function ExercisePicker({ onClose, onSubmit }: ExercisePickerProps) {
   const { exerciseRepository } = useDatabase();
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [selectedExercise, setSelectedExercise] =
-    useState<ExerciseModel | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<number | null>(null);
 
   useEffect(() => {
     async function queryExercises() {
@@ -40,25 +37,31 @@ function ExercisePicker({ onClose, onSubmit, isOpen }: ExercisePickerProps) {
     queryExercises();
   }, []);
 
-  const renderItem: ListRenderItem<ExerciseModel> = ({ item }) => (
-    <Box
-      w="full"
-      p="3"
-      rounded="lg"
-      _dark={{ backgroundColor: "gray.700", borderColor: "coolGray.600" }}
-      shadow="2"
-      my="1"
+  const renderItem: ListRenderItem<ExerciseModel> = ({ item, index }) => (
+    <Pressable
+      onPress={() => {
+        setSelectedExercise(index);
+      }}
     >
-      <Stack>
-        <Heading size="md">{item.name}</Heading>
-        <Text>Sample description blabla</Text>
-      </Stack>
-    </Box>
+      <Box
+        w="full"
+        p="3"
+        rounded="lg"
+        bg={selectedExercise === index ? "violet.400" : "gray.700"}
+        shadow="2"
+        my="1"
+      >
+        <Stack>
+          <Heading size="md">{item.name}</Heading>
+          <Text>Sample description blabla</Text>
+        </Stack>
+      </Box>
+    </Pressable>
   );
 
   return (
     <Center>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal onClose={onClose}>
         <Modal.Content w="90%" maxH="80%">
           <Modal.Body maxH="500px">
             {isLoading ? (
@@ -82,7 +85,7 @@ function ExercisePicker({ onClose, onSubmit, isOpen }: ExercisePickerProps) {
               <Button
                 disabled={selectedExercise === null}
                 onPress={() => {
-                  onSubmit(selectedExercise!);
+                  onSubmit(exercises[selectedExercise!]);
                 }}
               >
                 Save
