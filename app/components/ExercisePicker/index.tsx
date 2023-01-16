@@ -1,41 +1,25 @@
 import { StaticModal as Modal } from "@App/components/StaticModal";
 import { ExerciseModel } from "@App/data/entities/Exercise";
-import { useDatabase } from "@App/hooks/useDatabase";
 import {
   Box,
   Button,
   Center,
   FlatList,
-  Heading, Pressable, Spinner,
-  Stack,
+  Heading,
+  Pressable, Stack,
   Text
 } from "native-base";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ListRenderItem } from "react-native";
 
 type ExercisePickerProps = {
   onSubmit: (exercise: ExerciseModel) => void;
   onClose: () => void;
+  exercises: ExerciseModel[];
 };
 
-function ExercisePicker({ onClose, onSubmit }: ExercisePickerProps) {
-  const { exerciseRepository } = useDatabase();
-  const [exercises, setExercises] = useState<ExerciseModel[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
+function ExercisePicker({ onClose, onSubmit, exercises = [] }: ExercisePickerProps) {
   const [selectedExercise, setSelectedExercise] = useState<number | null>(null);
-
-  useEffect(() => {
-    async function queryExercises() {
-      setLoading(true);
-
-      const exercises = await exerciseRepository.getAll();
-
-      setExercises(exercises);
-      setLoading(false);
-    }
-
-    queryExercises();
-  }, []);
 
   const renderItem: ListRenderItem<ExerciseModel> = ({ item, index }) => (
     <Pressable
@@ -61,21 +45,17 @@ function ExercisePicker({ onClose, onSubmit }: ExercisePickerProps) {
 
   return (
     <Center>
-      <Modal onClose={onClose}>
+      <Modal isOpen={true} onClose={onClose}>
         <Modal.Content w="90%" maxH="80%">
           <Modal.Body maxH="500px">
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <>
-                <Heading>Exercises</Heading>
-                <FlatList
-                  data={exercises}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => String(item.id)}
-                ></FlatList>
-              </>
-            )}
+            <>
+              <Heading>Exercises</Heading>
+              <FlatList
+                data={exercises}
+                renderItem={renderItem}
+                keyExtractor={(item) => String(item.id)}
+              ></FlatList>
+            </>
           </Modal.Body>
           <Modal.Footer>
             <Button.Group space={2}>
