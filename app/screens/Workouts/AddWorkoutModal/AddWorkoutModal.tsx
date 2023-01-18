@@ -23,55 +23,27 @@ import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 interface ExerciseCardProps {
+  exerciseIndex: number;
   exercise: WorkoutExercise;
+  exerciseSets: ExerciseSet[];
+  onAddSet: (index: number) => void;
+  onRepChange: (exerciseIndex: number,setIndex: number) => (value: string) => void;
+  onWeightChange: (exerciseIndex: number,setIndex: number) => (value: string) => void;
+  onTypeChange: (exerciseIndex: number,setIndex: number) => (value: string) => void;
 }
 
-function ExerciseCard({ exercise }: ExerciseCardProps) {
+function ExerciseCard({
+  exerciseIndex,
+  exercise,
+  onAddSet,
+  exerciseSets,
+  onRepChange,
+  onWeightChange,
+  onTypeChange,
+}: ExerciseCardProps) {
   const [sets, setSets] = useState<ExerciseSet[]>([]);
 
-  const onRepChange = (index: number) => (value: string) => {
-    const setsClone = [...sets];
-
-    setsClone[index] = {
-      ...setsClone[index],
-      reps: Number(value.replace(/^0+/, "")),
-    };
-
-    setSets(setsClone);
-  };
-
-  const onWeightChange = (index: number) => (value: string) => {
-    const setsClone = [...sets];
-
-    setsClone[index] = {
-      ...setsClone[index],
-      weight: Number(value),
-    };
-
-    setSets(setsClone);
-  };
-
-  const onTypeChange = (index: number) => (value: string) => {
-    const setsClone = [...sets];
-
-    setsClone[index] = {
-      ...setsClone[index],
-      type: value as SetType,
-    };
-
-    setSets(setsClone);
-  };
-
-  const addSetHandler = () => {
-    if (sets.length !== 0) {
-      // If there's already a set, copy the last one
-      setSets([...sets, { ...sets[sets.length - 1], type: "REGULAR" }]);
-      return;
-    }
-
-    setSets([...sets, { reps: 0, weight: 0, type: "REGULAR" }]);
-  };
-
+  // Keep track 
   let setCounter = 1;
 
   return (
@@ -105,8 +77,8 @@ function ExerciseCard({ exercise }: ExerciseCardProps) {
               </Heading>
             </Box>
           </Flex>
-          {sets &&
-            sets.map((item, index) => (
+          {exerciseSets &&
+            exerciseSets.map((item, index) => (
               <Flex direction="row" h="10" key={`set-${index}`}>
                 {/* <Button size="md" flex={1}>W</Button> */}
                 <Select
@@ -117,7 +89,7 @@ function ExerciseCard({ exercise }: ExerciseCardProps) {
                   dropdownIcon={<></>}
                   borderColor="violet.500"
                   mx="1"
-                  onValueChange={onTypeChange(index)}
+                  onValueChange={onTypeChange(exerciseIndex, index)}
                 >
                   <Select.Item label="WARMUP" value="WARMUP" />
                   <Select.Item
@@ -140,7 +112,7 @@ function ExerciseCard({ exercise }: ExerciseCardProps) {
                   flex={1}
                   mx="1"
                   value={String(item.weight)}
-                  onChangeText={onWeightChange(index)}
+                  onChangeText={onWeightChange(exerciseIndex, index)}
                 />
                 <Input
                   keyboardType="number-pad"
@@ -149,14 +121,14 @@ function ExerciseCard({ exercise }: ExerciseCardProps) {
                   flex={1}
                   mx="1"
                   value={String(item.reps)}
-                  onChangeText={onRepChange(index)}
+                  onChangeText={onRepChange(exerciseIndex, index)}
                 />
               </Flex>
             ))}
           <Button
             leftIcon={<FontAwesome5 name="plus" size="sm" color="white" />}
             bg="violet.600"
-            onPress={addSetHandler}
+            onPress={() => onAddSet(exerciseIndex)}
           >
             Set
           </Button>
@@ -182,11 +154,14 @@ interface WorkoutExercise extends Pick<ExerciseModel, "id" | "name"> {
   sets: ExerciseSet[];
 }
 
+const DEFAULT_SET: ExerciseSet = { weight: 1, reps: 6, type: 'REGULAR' };
+
 function AddWorkoutModal() {
   const [workoutItems, setWorkoutItems] = useState<WorkoutExercise[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
+  const [exerciseSets, setExerciseSets] = useState<ExerciseSet[][]>([]);
 
   const { exerciseRepository } = useDatabase();
 
@@ -208,8 +183,70 @@ function AddWorkoutModal() {
       ...workoutItems,
       { ...exercise, sets: [] } as WorkoutExercise,
     ]);
+
+    setExerciseSets([...exerciseSets, [DEFAULT_SET]]);
+
     setShowModal(false);
   };
+
+  const addSetHandler = (index: number) => {
+    /**
+     * TODO:
+     * - Exercises should keep track of a pb (Or allow a user to set a 'default' weight)
+     */
+    let setClone = [...exerciseSets];
+
+    let newSet: ExerciseSet;
+    if (exerciseSets[index].length !== 0) {
+      const lastIndex = exerciseSets[index].length - 1;
+      newSet = { ...exerciseSets[index][lastIndex], type: "REGULAR" };
+    } else {
+      newSet = { reps: 6, weight: 1, type: "REGULAR" };
+    }
+
+    setClone[index].push(newSet);
+
+    setExerciseSets(setClone);
+  };
+
+  const changeRepHandler =
+    (exerciseIndex: number, setIndex: number) => (value: string) => {
+      let setClone = [...exerciseSets];
+      let modifiedSet = setClone[exerciseIndex][setIndex];
+
+      setClone[exerciseIndex][setIndex] = {
+        ...modifiedSet,
+        reps: Number(value.replace(/^0+/, "")),
+      };
+
+      setExerciseSets(setClone);
+    };
+
+  const changeWeightHandler =
+    (exerciseIndex: number, setIndex: number) => (value: string) => {
+      let setClone = [...exerciseSets];
+      let modifiedSet = setClone[exerciseIndex][setIndex];
+
+      setClone[exerciseIndex][setIndex] = {
+        ...modifiedSet,
+        weight: Number(value),
+      };
+
+      setExerciseSets(setClone);
+    };
+
+  const changeTypeHandler =
+    (exerciseIndex: number, setIndex: number) => (value: string) => {
+      let setClone = [...exerciseSets];
+      let modifiedSet = setClone[exerciseIndex][setIndex];
+
+      setClone[exerciseIndex][setIndex] = {
+        ...modifiedSet,
+        type: value as SetType,
+      };
+
+      setExerciseSets(setClone);
+    };
 
   return (
     <Box>
@@ -239,13 +276,17 @@ function AddWorkoutModal() {
               Add Exercise
             </Button>
             {workoutItems.map((item, index) => (
-              <ExerciseCard key={index} exercise={item} />
+              <ExerciseCard
+                key={index}
+                exerciseIndex={index}
+                exercise={item}
+                onAddSet={addSetHandler}
+                exerciseSets={exerciseSets[index]}
+                onRepChange={changeRepHandler}
+                onWeightChange={changeWeightHandler}
+                onTypeChange={changeTypeHandler}
+              />
             ))}
-            {/* {workoutItems.map((item, index) => (
-              <Box key={index}>
-                <Heading>{item.name}</Heading>
-              </Box>
-            ))} */}
           </Stack>
         </View>
       </ScrollView>
