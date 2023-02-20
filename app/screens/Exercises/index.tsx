@@ -53,8 +53,14 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    const result = await exerciseRepository.getAll();
-    setExercises(result);
+    
+    try{
+      const result = await exerciseRepository.getAll();
+      setExercises(result);
+    } catch (e) {
+      console.log(e)
+    }
+
     setRefreshing(false);
   }, []);
 

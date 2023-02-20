@@ -1,16 +1,20 @@
 import AppDataSource from "@App/data/AppDataSource";
 import { ExerciseRepository } from "@App/data/repositories/ExerciseRepository";
+import { WorkoutRepository } from "@App/data/repositories/WorkoutRepository";
 import { Box, Center, Heading, Spinner } from "native-base";
 import React, {
   createContext,
   ReactNode,
   useCallback,
   useEffect,
-  useState
+  useState,
 } from "react";
+import { ExerciseSetRepository } from "../data/repositories/ExerciseSetRepository";
 
 interface DatabaseConnectionContextRepos {
   exerciseRepository: ExerciseRepository;
+  workoutRepository: WorkoutRepository;
+  exerciseSetRepository: ExerciseSetRepository;
 }
 
 // prettier-ignore
@@ -29,8 +33,14 @@ export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({ 
   const [isInitialized, setInitialized] = useState<boolean>(false);
 
   const initializeDataSource = useCallback(async () => {
-    await AppDataSource.initialize();
-    await delay(4000);
+    try {
+      await AppDataSource.initialize();
+    } catch (e) {
+      console.log(e)
+    }
+    
+    // Test loading on app load
+    // await delay(4000);
     setInitialized(true);
   }, []);
 
@@ -55,7 +65,11 @@ export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({ 
 
   return (
     <DatabaseConnectionContext.Provider
-      value={{ exerciseRepository: new ExerciseRepository(AppDataSource) }}
+      value={{ 
+        exerciseRepository: new ExerciseRepository(AppDataSource), 
+        workoutRepository: new WorkoutRepository(AppDataSource),
+        exerciseSetRepository: new ExerciseSetRepository(AppDataSource)
+      }}
     >
       {children}
     </DatabaseConnectionContext.Provider>

@@ -7,163 +7,51 @@ import { RootWorkoutStackParamList } from "@Root/Navigation";
 import {
   Box,
   Button,
-  Center,
-  Flex,
   FormControl,
   Heading,
   Input,
   ScrollView,
-  Select,
   Stack,
   View,
-  VStack,
   WarningOutlineIcon
 } from "native-base";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-
-interface ExerciseCardProps {
-  exerciseIndex: number;
-  exercise: WorkoutExercise;
-  exerciseSets: ExerciseSet[];
-  onAddSet: (index: number) => void;
-  onRepChange: (exerciseIndex: number,setIndex: number) => (value: string) => void;
-  onWeightChange: (exerciseIndex: number,setIndex: number) => (value: string) => void;
-  onTypeChange: (exerciseIndex: number,setIndex: number) => (value: string) => void;
-}
-
-function ExerciseCard({
-  exerciseIndex,
-  exercise,
-  onAddSet,
-  exerciseSets,
-  onRepChange,
-  onWeightChange,
-  onTypeChange,
-}: ExerciseCardProps) {
-  const [sets, setSets] = useState<ExerciseSet[]>([]);
-
-  // Keep track 
-  let setCounter = 1;
-
-  return (
-    <>
-      <Box
-        borderWidth="1"
-        shadow="6"
-        borderColor="gray.700"
-        bg="gray.900"
-        p="2"
-        borderRadius="lg"
-      >
-        <VStack space={4}>
-          <Center>
-            <Heading>{exercise.name}</Heading>
-          </Center>
-          <Flex direction="row" h="6">
-            <Box flex={1} mx="1">
-              <Heading size="sm" textAlign="center">
-                Set
-              </Heading>
-            </Box>
-            <Box flex={1} mx="1">
-              <Heading size="sm" textAlign="center">
-                kg
-              </Heading>
-            </Box>
-            <Box flex={1} mx="1">
-              <Heading size="sm" textAlign="center">
-                Reps
-              </Heading>
-            </Box>
-          </Flex>
-          {exerciseSets &&
-            exerciseSets.map((item, index) => (
-              <Flex direction="row" h="10" key={`set-${index}`}>
-                {/* <Button size="md" flex={1}>W</Button> */}
-                <Select
-                  flex={1}
-                  selectedValue={item.type}
-                  h="full"
-                  textAlign="center"
-                  dropdownIcon={<></>}
-                  borderColor="violet.500"
-                  mx="1"
-                  onValueChange={onTypeChange(exerciseIndex, index)}
-                >
-                  <Select.Item label="WARMUP" value="WARMUP" />
-                  <Select.Item
-                    label={String(
-                      item.type === "REGULAR" ? setCounter++ : "REGULAR"
-                    )}
-                    value="REGULAR"
-                  />
-                  <Select.Item
-                    label="DROP"
-                    _text={{ fontWeight: "bold", color: "white" }}
-                    value="DROP"
-                  />
-                </Select>
-                <Input
-                  bg="gray.800"
-                  keyboardType="number-pad"
-                  size="md"
-                  textAlign="center"
-                  flex={1}
-                  mx="1"
-                  value={String(item.weight)}
-                  onChangeText={onWeightChange(exerciseIndex, index)}
-                />
-                <Input
-                  keyboardType="number-pad"
-                  size="md"
-                  textAlign="center"
-                  flex={1}
-                  mx="1"
-                  value={String(item.reps)}
-                  onChangeText={onRepChange(exerciseIndex, index)}
-                />
-              </Flex>
-            ))}
-          <Button
-            leftIcon={<FontAwesome5 name="plus" size="sm" color="white" />}
-            bg="violet.600"
-            onPress={() => onAddSet(exerciseIndex)}
-          >
-            Set
-          </Button>
-        </VStack>
-      </Box>
-    </>
-  );
-}
+import ExerciseSetCard from "../../../components/ExerciseSetCard";
+import { ExerciseSetModel, SetType } from "../../../data/entities/ExerciseSet";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
 interface AddWorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList, "AddWorkoutModal"> {}
 
-type SetType = "WARMUP" | "REGULAR" | "DROP";
+export interface ExerciseSet
+  extends Omit<
+    ExerciseSetModel,
+    "id" | "workoutSet" | "position" | "exercise" | "workout"
+  > {}
 
-type ExerciseSet = {
-  type: SetType;
-  reps: number;
-  weight: number;
-};
+const DEFAULT_SET: ExerciseSet = { weight: 1, reps: 6, type: SetType.REGULAR };
 
-interface WorkoutExercise extends Pick<ExerciseModel, "id" | "name"> {
-  sets: ExerciseSet[];
-}
-
-const DEFAULT_SET: ExerciseSet = { weight: 1, reps: 6, type: 'REGULAR' };
-
-function AddWorkoutModal() {
-  const [workoutItems, setWorkoutItems] = useState<WorkoutExercise[]>([]);
+/*
+  TODO:
+    - Reposition 'Add Exercise' and 'save Workout' buttons
+    - Create a better Set type picker
+    - Fix Set Type numbering
+    - Add haptic feedback to UI
+    - Resize elements to be more mobile ergonomic  
+*/
+function AddWorkoutModal({ navigation }: AddWorkoutProps) {
+  const [workoutItems, setWorkoutItems] = useState<ExerciseModel[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
   const [exerciseSets, setExerciseSets] = useState<ExerciseSet[][]>([]);
+  const [workoutName, setWorkoutName] = useState<string>("");
 
-  const { exerciseRepository } = useDatabase();
+  const { exerciseRepository, workoutRepository, exerciseSetRepository } =
+    useDatabase();
+
+  const validWorkout = workoutItems.length !== 0;
 
   useEffect(() => {
     async function queryExercises() {
@@ -179,14 +67,41 @@ function AddWorkoutModal() {
   }, []);
 
   const addExerciseHandler = (exercise: ExerciseModel) => {
-    setWorkoutItems([
-      ...workoutItems,
-      { ...exercise, sets: [] } as WorkoutExercise,
-    ]);
+    setWorkoutItems([...workoutItems, { ...exercise }]);
 
     setExerciseSets([...exerciseSets, [DEFAULT_SET]]);
 
     setShowModal(false);
+  };
+
+  const saveWorkout = async () => {
+    try {
+      // Create the new workout
+      let workoutEntity = await workoutRepository.create(workoutName, exercises);
+
+      // Create and store the sets linked to both the workout and the exercise (Cascade)
+      const exerciseSetEntities = workoutItems
+        .map((exercise, index) => [
+          ...exerciseSets[index].map((set, index) => ({
+            ...set,
+            exercise: { ...exercise, workouts: [workoutEntity] },
+            workout: workoutEntity,
+            position: index,
+          })),
+        ])
+        .flat();
+
+      const savedSetEntities = await exerciseSetRepository.create(
+        exerciseSetEntities as any
+      );
+
+      workoutEntity.sets = savedSetEntities;
+      workoutEntity = await workoutRepository.save(workoutEntity);
+
+      navigation.goBack();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const addSetHandler = (index: number) => {
@@ -199,9 +114,9 @@ function AddWorkoutModal() {
     let newSet: ExerciseSet;
     if (exerciseSets[index].length !== 0) {
       const lastIndex = exerciseSets[index].length - 1;
-      newSet = { ...exerciseSets[index][lastIndex], type: "REGULAR" };
+      newSet = { ...exerciseSets[index][lastIndex], type: SetType.REGULAR };
     } else {
-      newSet = { reps: 6, weight: 1, type: "REGULAR" };
+      newSet = { reps: 6, weight: 1, type: SetType.REGULAR };
     }
 
     setClone[index].push(newSet);
@@ -258,7 +173,7 @@ function AddWorkoutModal() {
             </Heading>
             <FormControl isRequired>
               <FormControl.Label>Workout Name</FormControl.Label>
-              <Input placeholder="Leg Day" size="xl" />
+              <Input placeholder="Leg Day" onChangeText={(value) => setWorkoutName(value)} size="xl" />
               <FormControl.ErrorMessage
                 leftIcon={<WarningOutlineIcon size="xs" />}
               >
@@ -276,7 +191,7 @@ function AddWorkoutModal() {
               Add Exercise
             </Button>
             {workoutItems.map((item, index) => (
-              <ExerciseCard
+              <ExerciseSetCard
                 key={index}
                 exerciseIndex={index}
                 exercise={item}
@@ -287,6 +202,18 @@ function AddWorkoutModal() {
                 onTypeChange={changeTypeHandler}
               />
             ))}
+            {validWorkout && (
+              <Button
+                isLoading={isLoading}
+                onPress={saveWorkout}
+                bg="violet.600"
+                leftIcon={
+                  <FontAwesome5 name="dumbbell" size="sm" color="white" />
+                }
+              >
+                Save Workout
+              </Button>
+            )}
           </Stack>
         </View>
       </ScrollView>

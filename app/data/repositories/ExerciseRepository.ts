@@ -1,5 +1,5 @@
 import { DataSource, Repository } from "typeorm";
-import { ExerciseModel } from "../entities/Exercise";
+import { ExerciseModel } from "@App/data/entities/Exercise";
 
 export class ExerciseRepository {
   private ormRepository: Repository<ExerciseModel>;
@@ -20,5 +20,11 @@ export class ExerciseRepository {
     const exercises = await this.ormRepository.find();
 
     return exercises;
+  }
+
+  public async save(exercises: ExerciseModel[]) {
+    const result = await this.ormRepository.save(exercises);
+
+    return result;
   }
 }

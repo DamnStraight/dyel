@@ -4,6 +4,7 @@ import { RootTabParamList, RootWorkoutStackParamList } from "@Root/Navigation";
 import { Box, Fab, Heading, Icon, ScrollView, Stack, View } from "native-base";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, StyleSheet } from "react-native";
+import { useDatabase } from "../../hooks/useDatabase";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
@@ -12,21 +13,24 @@ interface WorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList,
 function WorkoutScreen({ navigation }: WorkoutProps) {
   const [workouts, setWorkouts] = useState<any[]>([]);
   const [isRefreshing, setRefreshing] = useState<boolean>(false);
+  const { workoutRepository } = useDatabase();
 
   useEffect(() => {
     // Refresh the exercise list whenever the screen comes back into focus
     const unsubscribe = navigation.addListener("focus", () => {
-      // workoutuRespository.getAll().then(setWorkouts);
+      workoutRepository.getAll().then(setWorkouts);
     });
 
     return unsubscribe;
   }, [navigation]);
 
   const onRefresh = useCallback(async () => {
-    // setRefreshing(true);
-    // const result = await workRepository.getAll();
-    // setWorkouts(result);
-    // setRefreshing(false);
+    setRefreshing(true);
+
+    const result = await workoutRepository.getAll();
+    setWorkouts(result);
+    
+    setRefreshing(false);
   }, []);
 
   return (
@@ -43,9 +47,9 @@ function WorkoutScreen({ navigation }: WorkoutProps) {
             <Heading size="4xl" style={styles.header}>
               Workouts
             </Heading>
-            {/* {workouts.map(({ name }, i) => (
-              <ExerciseCard key={`${i}-${name}`} name={name} />
-            ))} */}
+            {workouts.map(({ name }, i) => (
+              <Heading key={i}>{name}</Heading>
+            ))}
           </Stack>
         </View>
       </ScrollView>
