@@ -7,15 +7,14 @@ import { RootWorkoutStackParamList } from "@Root/Navigation";
 import {
   Box,
   Button,
-  FormControl,
   Heading,
   Input,
   ScrollView,
   Stack,
   View,
-  WarningOutlineIcon
 } from "native-base";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import ExerciseSetCard from "../../../components/ExerciseSetCard";
 import { ExerciseSetModel, SetType } from "../../../data/entities/ExerciseSet";
@@ -24,34 +23,68 @@ import { ExerciseSetModel, SetType } from "../../../data/entities/ExerciseSet";
 // prettier-ignore
 interface AddWorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList, "AddWorkoutModal"> {}
 
-export interface ExerciseSet
-  extends Omit<
-    ExerciseSetModel,
-    "id" | "workoutSet" | "position" | "exercise" | "workout"
-  > {}
+export const DEFAULT_SET: Set = { weight: "", reps: "", type: SetType.REGULAR };
 
-const DEFAULT_SET: ExerciseSet = { weight: 1, reps: 6, type: SetType.REGULAR };
+interface ExerciseSetDto
+  extends Omit<ExerciseModel, "workouts" | "exerciseSets"> {
+  exerciseSets: Set[];
+}
+
+export interface Set extends Pick<ExerciseSetModel, 'type'> {
+  // Type these as string for Form input handling
+  weight: string;
+  reps: string;
+}
+
+export interface FormValues {
+  workoutName: string;
+  exercises: ExerciseSetDto[];
+}
 
 /*
   TODO:
-    - Reposition 'Add Exercise' and 'save Workout' buttons
     - Create a better Set type picker
+    - Remove uses of 'any' type
     - Fix Set Type numbering
     - Add haptic feedback to UI
     - Resize elements to be more mobile ergonomic  
 */
 function AddWorkoutModal({ navigation }: AddWorkoutProps) {
-  const [workoutItems, setWorkoutItems] = useState<ExerciseModel[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
-  const [exerciseSets, setExerciseSets] = useState<ExerciseSet[][]>([]);
-  const [workoutName, setWorkoutName] = useState<string>("");
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      exercises: [],
+    },
+  });
+
+  const { fields, append, remove, prepend } = useFieldArray({
+    control,
+    name: "exercises",
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+  };
+
+  const onInvalid = (data: any) => {
+    console.log(data);
+  };
 
   const { exerciseRepository, workoutRepository, exerciseSetRepository } =
     useDatabase();
 
-  const validWorkout = workoutItems.length !== 0;
+  const validWorkout = fields.length !== 0;
 
   useEffect(() => {
     async function queryExercises() {
@@ -67,9 +100,7 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
   }, []);
 
   const addExerciseHandler = (exercise: ExerciseModel) => {
-    setWorkoutItems([...workoutItems, { ...exercise }]);
-
-    setExerciseSets([...exerciseSets, [DEFAULT_SET]]);
+    append({ ...exercise, exerciseSets: [{ ...DEFAULT_SET }] });
 
     setShowModal(false);
   };
@@ -77,91 +108,45 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
   const saveWorkout = async () => {
     try {
       // Create the new workout
-      let workoutEntity = await workoutRepository.create(workoutName, exercises);
+      let workoutEntity = await workoutRepository.create(
+        getValues("workoutName"),
+        availableExercises
+      );
 
       // Create and store the sets linked to both the workout and the exercise (Cascade)
-      const exerciseSetEntities = workoutItems
-        .map((exercise, index) => [
-          ...exerciseSets[index].map((set, index) => ({
+      const exerciseSetEntities = getValues("exercises").map(
+        (exercise, index) => [
+          ...exercise.exerciseSets.map((set, index) => ({
             ...set,
             exercise: { ...exercise, workouts: [workoutEntity] },
             workout: workoutEntity,
             position: index,
           })),
-        ])
-        .flat();
+        ]
+      );
 
       const savedSetEntities = await exerciseSetRepository.create(
         exerciseSetEntities as any
       );
-
       workoutEntity.sets = savedSetEntities;
       workoutEntity = await workoutRepository.save(workoutEntity);
-
       navigation.goBack();
     } catch (e) {
       console.log(e);
     }
   };
 
-  const addSetHandler = (index: number) => {
-    /**
-     * TODO:
-     * - Exercises should keep track of a pb (Or allow a user to set a 'default' weight)
-     */
-    let setClone = [...exerciseSets];
-
-    let newSet: ExerciseSet;
-    if (exerciseSets[index].length !== 0) {
-      const lastIndex = exerciseSets[index].length - 1;
-      newSet = { ...exerciseSets[index][lastIndex], type: SetType.REGULAR };
-    } else {
-      newSet = { reps: 6, weight: 1, type: SetType.REGULAR };
-    }
-
-    setClone[index].push(newSet);
-
-    setExerciseSets(setClone);
-  };
-
-  const changeRepHandler =
-    (exerciseIndex: number, setIndex: number) => (value: string) => {
-      let setClone = [...exerciseSets];
-      let modifiedSet = setClone[exerciseIndex][setIndex];
-
-      setClone[exerciseIndex][setIndex] = {
-        ...modifiedSet,
-        reps: Number(value.replace(/^0+/, "")),
-      };
-
-      setExerciseSets(setClone);
-    };
-
-  const changeWeightHandler =
-    (exerciseIndex: number, setIndex: number) => (value: string) => {
-      let setClone = [...exerciseSets];
-      let modifiedSet = setClone[exerciseIndex][setIndex];
-
-      setClone[exerciseIndex][setIndex] = {
-        ...modifiedSet,
-        weight: Number(value),
-      };
-
-      setExerciseSets(setClone);
-    };
-
-  const changeTypeHandler =
-    (exerciseIndex: number, setIndex: number) => (value: string) => {
-      let setClone = [...exerciseSets];
-      let modifiedSet = setClone[exerciseIndex][setIndex];
-
-      setClone[exerciseIndex][setIndex] = {
-        ...modifiedSet,
-        type: value as SetType,
-      };
-
-      setExerciseSets(setClone);
-    };
+  // Only show exercises that haven't already been picked
+  const availableExercises = useMemo(
+    () =>
+      exercises.filter(
+        (exercise) =>
+          !(getValues("exercises") as any).some((item: any) => {
+            return item.id === exercise.id;
+          })
+      ),
+    [exercises, getValues]
+  );
 
   return (
     <Box>
@@ -171,15 +156,20 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
             <Heading size="3xl" style={styles.header}>
               Create Workout
             </Heading>
-            <FormControl isRequired>
-              <FormControl.Label>Workout Name</FormControl.Label>
-              <Input placeholder="Leg Day" onChangeText={(value) => setWorkoutName(value)} size="xl" />
-              <FormControl.ErrorMessage
-                leftIcon={<WarningOutlineIcon size="xs" />}
-              >
-                That workout name already exists!
-              </FormControl.ErrorMessage>
-            </FormControl>
+            <Controller
+              name={`workoutName`}
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Leg Day"
+                  onChangeText={onChange}
+                  value={value}
+                  size="xl"
+                />
+              )}
+            />
+
             <Button
               isLoading={isLoading}
               onPress={() => setShowModal(true)}
@@ -190,22 +180,18 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
             >
               Add Exercise
             </Button>
-            {workoutItems.map((item, index) => (
+            {fields.map((item, index) => (
               <ExerciseSetCard
-                key={index}
+                exerciseName={item.name}
                 exerciseIndex={index}
-                exercise={item}
-                onAddSet={addSetHandler}
-                exerciseSets={exerciseSets[index]}
-                onRepChange={changeRepHandler}
-                onWeightChange={changeWeightHandler}
-                onTypeChange={changeTypeHandler}
+                key={item.id}
+                {...{ control }}
               />
             ))}
             {validWorkout && (
               <Button
                 isLoading={isLoading}
-                onPress={saveWorkout}
+                onPress={handleSubmit(onSubmit, onInvalid)}
                 bg="violet.600"
                 leftIcon={
                   <FontAwesome5 name="dumbbell" size="sm" color="white" />
@@ -219,9 +205,7 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
       </ScrollView>
       {showModal && (
         <ExercisePicker
-          exercises={exercises.filter(
-            (exercise) => !workoutItems.some((item) => item.id === exercise.id)
-          )}
+          exercises={availableExercises}
           onClose={() => setShowModal(false)}
           onSubmit={addExerciseHandler}
         />

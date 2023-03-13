@@ -1,3 +1,6 @@
+import {
+  DEFAULT_SET, FormValues, Set
+} from "@App/screens/Workouts/AddWorkoutModal/AddWorkoutModal";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
   Box,
@@ -7,40 +10,41 @@ import {
   Heading,
   Input,
   Select,
-  VStack,
+  VStack
 } from "native-base";
-import { ExerciseSet } from "@App/screens/Workouts/AddWorkoutModal/AddWorkoutModal";
-import { ExerciseModel } from "@App/data/entities/Exercise";
+import {
+  Control,
+  Controller,
+  useFieldArray
+} from "react-hook-form";
 
 interface ExerciseCardProps {
+  exerciseName: string;
   exerciseIndex: number;
-  exercise: ExerciseModel;
-  exerciseSets: ExerciseSet[];
-  onAddSet: (index: number) => void;
-  onRepChange: (
-    exerciseIndex: number,
-    setIndex: number
-  ) => (value: string) => void;
-  onWeightChange: (
-    exerciseIndex: number,
-    setIndex: number
-  ) => (value: string) => void;
-  onTypeChange: (
-    exerciseIndex: number,
-    setIndex: number
-  ) => (value: string) => void;
+  control: Control<FormValues>;
 }
 
-function ExerciseSetCard({
+const ExerciseSetCard = ({
+  exerciseName,
   exerciseIndex,
-  exercise,
-  onAddSet,
-  exerciseSets,
-  onRepChange,
-  onWeightChange,
-  onTypeChange,
-}: ExerciseCardProps) {
-  let setCounter = 1;
+  control,
+}: ExerciseCardProps) => {
+  const { fields, remove, append } = useFieldArray({
+    control,
+    name: `exercises.${exerciseIndex}.exerciseSets`,
+  });
+
+  const addSetHandler = () => {
+    let newSet: Set = DEFAULT_SET;
+
+    // If the user has sets defined, copy the last one
+    if (fields.length > 0) {
+      const { reps, weight } = fields[0];
+      newSet = { ...newSet, reps, weight };
+    }
+
+    append(newSet);
+  };
 
   return (
     <>
@@ -54,7 +58,7 @@ function ExerciseSetCard({
       >
         <VStack space={4}>
           <Center>
-            <Heading>{exercise.name}</Heading>
+            <Heading>{exerciseName}</Heading>
           </Center>
           <Flex direction="row" h="6">
             <Box flex={1} mx="1">
@@ -73,57 +77,85 @@ function ExerciseSetCard({
               </Heading>
             </Box>
           </Flex>
-          {exerciseSets &&
-            exerciseSets.map((item, index) => (
-              <Flex direction="row" h="10" key={`set-${index}`}>
-                <Select
-                  flex={1}
-                  selectedValue={item.type}
-                  h="full"
-                  textAlign="center"
-                  dropdownIcon={<></>}
-                  borderColor="violet.500"
-                  mx="1"
-                  onValueChange={onTypeChange(exerciseIndex, index)}
-                >
-                  <Select.Item label="WARMUP" value="WARMUP" />
-                  <Select.Item
-                    label={String(
-                      item.type === "REGULAR" ? setCounter++ : "REGULAR"
-                    )}
-                    value="REGULAR"
+          {fields.map((item, index) => (
+            <Flex direction="row" h="10" key={item.id}>
+              <Controller
+                name={`exercises.${exerciseIndex}.exerciseSets.${index}.type`}
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    flex={1}
+                    h="full"
+                    textAlign="center"
+                    dropdownIcon={<></>}
+                    borderColor="violet.500"
+                    defaultValue={item.type}
+                    onValueChange={(value) => {
+                      onChange(value);
+                    }}
+                    selectedValue={value}
+                    mx="1"
+                  >
+                    <Select.Item label="WARMUP" value="WARMUP" />
+                    <Select.Item
+                      label={String(
+                        item.type === "REGULAR" ? index + 1 : "REGULAR"
+                      )}
+                      value="REGULAR"
+                    />
+                    <Select.Item
+                      label="DROP"
+                      _text={{ fontWeight: "bold", color: "white" }}
+                      value="DROP"
+                    />
+                  </Select>
+                )}
+              />
+              <Controller
+                name={`exercises.${exerciseIndex}.exerciseSets.${index}.weight`}
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    bg="gray.800"
+                    keyboardType="numeric"
+                    size="md"
+                    textAlign="center"
+                    flex={1}
+                    mx="1"
+                    onChangeText={onChange}
+                    value={value}
+                    defaultValue={item.weight}
+                    placeholder={"0"}
                   />
-                  <Select.Item
-                    label="DROP"
-                    _text={{ fontWeight: "bold", color: "white" }}
-                    value="DROP"
+                )}
+              />
+              <Controller
+                name={`exercises.${exerciseIndex}.exerciseSets.${index}.reps`}
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    bg="gray.800"
+                    keyboardType="numeric"
+                    size="md"
+                    textAlign="center"
+                    flex={1}
+                    mx="1"
+                    onChangeText={onChange}
+                    value={value}
+                    defaultValue={item.reps}
+                    placeholder={"0"}
                   />
-                </Select>
-                <Input
-                  bg="gray.800"
-                  keyboardType="number-pad"
-                  size="md"
-                  textAlign="center"
-                  flex={1}
-                  mx="1"
-                  value={String(item.weight)}
-                  onChangeText={onWeightChange(exerciseIndex, index)}
-                />
-                <Input
-                  keyboardType="number-pad"
-                  size="md"
-                  textAlign="center"
-                  flex={1}
-                  mx="1"
-                  value={String(item.reps)}
-                  onChangeText={onRepChange(exerciseIndex, index)}
-                />
-              </Flex>
-            ))}
+                )}
+              />
+            </Flex>
+          ))}
           <Button
             leftIcon={<FontAwesome5 name="plus" size="sm" color="white" />}
             bg="violet.600"
-            onPress={() => onAddSet(exerciseIndex)}
+            onPress={addSetHandler}
           >
             Set
           </Button>
@@ -131,6 +163,6 @@ function ExerciseSetCard({
       </Box>
     </>
   );
-}
+};
 
 export default ExerciseSetCard;
