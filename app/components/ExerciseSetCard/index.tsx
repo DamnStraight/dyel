@@ -1,6 +1,3 @@
-import {
-  DEFAULT_SET, FormValues, Set
-} from "@App/screens/Workouts/AddWorkoutModal/AddWorkoutModal";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
   Box,
@@ -17,11 +14,12 @@ import {
   Controller,
   useFieldArray
 } from "react-hook-form";
+import { AddWorkoutFormValues, DEFAULT_SET, Set } from "../../screens/Workouts/AddWorkoutModal/types";
 
 interface ExerciseCardProps {
   exerciseName: string;
   exerciseIndex: number;
-  control: Control<FormValues>;
+  control: Control<AddWorkoutFormValues>;
 }
 
 const ExerciseSetCard = ({

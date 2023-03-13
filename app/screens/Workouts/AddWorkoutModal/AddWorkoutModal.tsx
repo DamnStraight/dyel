@@ -11,35 +11,17 @@ import {
   Input,
   ScrollView,
   Stack,
-  View,
+  View
 } from "native-base";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import ExerciseSetCard from "../../../components/ExerciseSetCard";
-import { ExerciseSetModel, SetType } from "../../../data/entities/ExerciseSet";
+import { AddWorkoutFormValues, DEFAULT_SET } from "./types";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
 interface AddWorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList, "AddWorkoutModal"> {}
-
-export const DEFAULT_SET: Set = { weight: "", reps: "", type: SetType.REGULAR };
-
-interface ExerciseSetDto
-  extends Omit<ExerciseModel, "workouts" | "exerciseSets"> {
-  exerciseSets: Set[];
-}
-
-export interface Set extends Pick<ExerciseSetModel, 'type'> {
-  // Type these as string for Form input handling
-  weight: string;
-  reps: string;
-}
-
-export interface FormValues {
-  workoutName: string;
-  exercises: ExerciseSetDto[];
-}
 
 /*
   TODO:
@@ -62,7 +44,7 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<AddWorkoutFormValues>({
     defaultValues: {
       exercises: [],
     },
@@ -115,7 +97,7 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
 
       // Create and store the sets linked to both the workout and the exercise (Cascade)
       const exerciseSetEntities = getValues("exercises").map(
-        (exercise, index) => [
+        (exercise, _) => [
           ...exercise.exerciseSets.map((set, index) => ({
             ...set,
             exercise: { ...exercise, workouts: [workoutEntity] },
