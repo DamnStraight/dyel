@@ -1,14 +1,16 @@
 import "reflect-metadata";
 import { extendTheme, NativeBaseProvider, useColorMode } from "native-base";
-import RootNavigation from "./Navigation";
-import { DatabaseConnectionProvider } from "./app/context/DatabaseConnectionContext";
+import { Provider } from "@App/provider";
+import RootNavigation from "@App/navigation";
 
 const config = {
   useSystemColorMode: false,
   initialColorMode: "dark",
 };
 
-const customTheme = extendTheme({ config });
+const customTheme = extendTheme({
+  config,
+});
 
 export default function App() {
   // @TODO Look into this bug, setting initialColorMode to 'dark' should be enough
@@ -17,9 +19,9 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={customTheme}>
-      <DatabaseConnectionProvider>
+      <Provider>
         <RootNavigation />
-      </DatabaseConnectionProvider>
+      </Provider>
     </NativeBaseProvider>
   );
 }

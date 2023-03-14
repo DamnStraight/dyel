@@ -1,31 +1,22 @@
-import {
-  Box,
-  Heading,
-  ScrollView,
-  VStack,
-  Text,
-  Pressable,
-  HStack,
-} from "native-base";
 import { View, StyleSheet } from "react-native";
+import { Stack, XStack, YStack, ScrollView, Heading } from "tamagui";
 
 function DashboardScreen() {
   return (
-    <Box safeAreaTop>
-      <Box p="4">
-        <ScrollView w="full" h="full">
-          <VStack space={4}>
-            <Box>
-              <Heading size="2xl" style={styles.textShadowLarge}>
+    // <YStack fullscreen>
+        <ScrollView maxHeight={500}>
+          <YStack>
+            <YStack w="100%" padding={20}>
+              <Heading size={"$10"} style={styles.textShadowLarge} color="white">
                 {/* TODO Make this based on the time of day (Good monring, good afternoon, good evening) */}
                 Good Morning,
               </Heading>
-              <Heading size="3xl" style={styles.textShadowLarge}>
+              <Heading size="$10" style={styles.textShadowLarge} color="white">
                 {/* Allow user to enter name in settings personalization */}
                 Steven
               </Heading>
-            </Box>
-            <Pressable>
+            </YStack>
+            {/* <Pressable>
               {({ isPressed }) => {
                 return (
                   <Box
@@ -35,7 +26,7 @@ function DashboardScreen() {
                     minH="40"
                     shadow="lg"
                   >
-                    <VStack space={2}>
+                    <YStack space={2}>
                       <Heading style={styles.textShadowSmall}>
                         Your last workout
                       </Heading>
@@ -46,37 +37,22 @@ function DashboardScreen() {
                         Bla bla text might go here, like if you did something
                         notable like hit a new PR lift
                       </Text>
-                    </VStack>
+                    </YStack>
                   </Box>
                 );
               }}
-            </Pressable>
-            <HStack space="4">
-              <Box
-                w="48%"
-                h="40"
-                bg="violet.200"
-                rounded="lg"
-                p="4"
-                shadow="lg"
-              >
-                <Heading color="gray.800">Settings</Heading>
-              </Box>
-              <Box
-                w="48%"
-                h="40"
-                bg="violet.200"
-                rounded="lg"
-                p="4"
-                shadow="lg"
-              >
-                <Heading color="gray.800">Temp</Heading>
-              </Box>
-            </HStack>
-          </VStack>
+            </Pressable> */}
+            <XStack>
+              <Stack bg="white" flex={0.5} borderRadius={10} margin={15} padding={20} h={175}>
+                <Heading>Settings</Heading>
+              </Stack>
+              <Stack bg="white" flex={0.5} borderRadius={10} margin={15} padding={20} h={175}>
+                <Heading>Temp</Heading>
+              </Stack>
+            </XStack>
+          </YStack>
         </ScrollView>
-      </Box>
-    </Box>
+    // </YStack>
   );
 }
 
