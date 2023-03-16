@@ -3,21 +3,14 @@ import { ExerciseModel } from "@App/data/entities/Exercise";
 import { useDatabase } from "@App/hooks/useDatabase";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootWorkoutStackParamList } from "@Root/Navigation";
-import {
-  Box,
-  Button,
-  Heading,
-  Input,
-  ScrollView,
-  Stack,
-  View
-} from "native-base";
+import { RootWorkoutStackParamList } from "@App/Navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import ExerciseSetCard from "../../../components/ExerciseSetCard";
 import { AddWorkoutFormValues, DEFAULT_SET } from "./types";
+import { SafeAreaView } from "react-native";
+import { Button, Heading, Input, ScrollView, Stack, YStack } from "tamagui";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
@@ -96,16 +89,14 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
       );
 
       // Create and store the sets linked to both the workout and the exercise (Cascade)
-      const exerciseSetEntities = getValues("exercises").map(
-        (exercise, _) => [
-          ...exercise.exerciseSets.map((set, index) => ({
-            ...set,
-            exercise: { ...exercise, workouts: [workoutEntity] },
-            workout: workoutEntity,
-            position: index,
-          })),
-        ]
-      );
+      const exerciseSetEntities = getValues("exercises").map((exercise, _) => [
+        ...exercise.exerciseSets.map((set, index) => ({
+          ...set,
+          exercise: { ...exercise, workouts: [workoutEntity] },
+          workout: workoutEntity,
+          position: index,
+        })),
+      ]);
 
       const savedSetEntities = await exerciseSetRepository.create(
         exerciseSetEntities as any
@@ -131,37 +122,35 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
   );
 
   return (
-    <Box>
-      <ScrollView w="full" h="full">
-        <View p="4">
-          <Stack w="full" space="4">
-            <Heading size="3xl" style={styles.header}>
-              Create Workout
-            </Heading>
-            <Controller
-              name={`workoutName`}
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  placeholder="Leg Day"
-                  onChangeText={onChange}
-                  value={value}
-                  size="xl"
-                />
-              )}
-            />
+    <>
+      <ScrollView fullscreen>
+        <YStack height="100%" w="100%" space="$4">
+          <Heading size="$10" style={styles.header}>
+            Create Workout
+          </Heading>
+          <Controller
+            name={`workoutName`}
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Leg Day"
+                onChangeText={onChange}
+                value={value}
+                size="$5"
+              />
+            )}
+          />
 
-            <Button
-              isLoading={isLoading}
-              onPress={() => setShowModal(true)}
-              bg="violet.600"
-              leftIcon={
-                <FontAwesome5 name="dumbbell" size="sm" color="white" />
-              }
-            >
-              Add Exercise
-            </Button>
+          <Button
+            disabled={isLoading}
+            onPress={() => setShowModal(true)}
+            bg="blue"
+            icon={<FontAwesome5 name="dumbbell" size={16} color="white" />}
+          >
+            Add Exercise
+          </Button>
+          <Stack>
             {fields.map((item, index) => (
               <ExerciseSetCard
                 exerciseName={item.name}
@@ -170,20 +159,19 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
                 {...{ control }}
               />
             ))}
-            {validWorkout && (
+          </Stack>
+          {validWorkout && (
+            <YStack position="absolute" bottom={0} width="100%" height={50}>
               <Button
-                isLoading={isLoading}
+                disabled={isLoading}
                 onPress={handleSubmit(onSubmit, onInvalid)}
-                bg="violet.600"
-                leftIcon={
-                  <FontAwesome5 name="dumbbell" size="sm" color="white" />
-                }
+                bg="blue"
               >
                 Save Workout
               </Button>
-            )}
-          </Stack>
-        </View>
+            </YStack>
+          )}
+        </YStack>
       </ScrollView>
       {showModal && (
         <ExercisePicker
@@ -192,7 +180,7 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
           onSubmit={addExerciseHandler}
         />
       )}
-    </Box>
+    </>
   );
 }
 

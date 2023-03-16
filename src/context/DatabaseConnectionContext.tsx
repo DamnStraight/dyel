@@ -1,7 +1,6 @@
 import AppDataSource from "@App/data/AppDataSource";
 import { ExerciseRepository } from "@App/data/repositories/ExerciseRepository";
 import { WorkoutRepository } from "@App/data/repositories/WorkoutRepository";
-import { Box, Center, Heading, Spinner } from "native-base";
 import React, {
   createContext,
   ReactNode,
@@ -9,6 +8,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { Heading, Spinner, Stack } from "tamagui";
 import { ExerciseSetRepository } from "../data/repositories/ExerciseSetRepository";
 
 interface DatabaseConnectionContextRepos {
@@ -52,14 +52,12 @@ export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({ 
 
   if (!isInitialized) {
     return (
-      <Box h="full" w="full" bg="gray.800" safeAreaTop>
-        <Center h="full">
-          <Spinner size="lg" color="violet.500" />
-          <Heading size="3xl" color="violet.500">
+      <Stack h="100%" w="100%" bg="gray">
+          <Spinner size="large" color="red" />
+          <Heading size="$10" color="violet">
             Loading
           </Heading>
-        </Center>
-      </Box>
+      </Stack>
     );
   }
 

@@ -1,10 +1,11 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { RootWorkoutStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootTabParamList, RootWorkoutStackParamList } from "@Root/Navigation";
-import { Box, Fab, Heading, Icon, ScrollView, Stack, View } from "native-base";
 import { useCallback, useEffect, useState } from "react";
-import { RefreshControl, StyleSheet } from "react-native";
+import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
+import { Button, H1, Heading, ScrollView, Stack } from "tamagui";
 import { useDatabase } from "../../hooks/useDatabase";
+import { FontAwesome } from "@expo/vector-icons";
+import FAB from "../../components/FAB";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
@@ -29,41 +30,34 @@ function WorkoutScreen({ navigation }: WorkoutProps) {
 
     const result = await workoutRepository.getAll();
     setWorkouts(result);
-    
+
     setRefreshing(false);
   }, []);
 
   return (
-    <Box safeAreaTop>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
-        w="full"
-        h="full"
+        w="100%"
+        h="100%"
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
         }
+        p="$4"
       >
-        <View p="4">
-          <Stack w="full" space="4">
-            <Heading size="4xl" style={styles.header}>
+        <Stack p={5}>
+          <Stack w="100%" space="$4">
+            <H1 color="$slate50" size="$12" style={styles.header}>
               Workouts
-            </Heading>
+            </H1>
             {workouts.map(({ name }, i) => (
               <Heading key={i}>{name}</Heading>
             ))}
           </Stack>
-        </View>
+        </Stack>
       </ScrollView>
-      <Fab
-        onPress={() => navigation.navigate("AddWorkoutModal")}
-        renderInPortal={false}
-        shadow={4}
-        size="lg"
-        w="75"
-        h="75"
-        icon={<Icon as={FontAwesome5} name="plus" size="xl" ml="1" />}
-        backgroundColor="violet.700"
-      />
-    </Box>
+      {/* TODO Convert this to FAB component */}
+      <FAB onPress={() => navigation.navigate("AddWorkoutModal")} />
+    </SafeAreaView>
   );
 }
 

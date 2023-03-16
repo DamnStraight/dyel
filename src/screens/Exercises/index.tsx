@@ -5,7 +5,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { Button, Heading, ScrollView, Stack, Text, YStack } from "tamagui";
+import { Button, Heading, ScrollView, Stack, Text, YStack, H1 } from "tamagui";
+import FAB from "../../components/FAB";
 
 function ExerciseCard({ name }: { name: string }) {
   return (
@@ -63,9 +64,9 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
           >
             <Stack p={4}>
               <YStack flex={1} space="$4">
-                <Heading size="$10" color="white" style={styles.header}>
+                <H1 color="$slate50" size="$12" style={styles.header}>
                   Exercises
-                </Heading>
+                </H1>
                 {exercises.map(({ name }, i) => (
                   <ExerciseCard key={`${i}-${name}`} name={name} />
                 ))}
@@ -73,26 +74,7 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
             </Stack>
           </ScrollView>
         </YStack>
-        {/* TODO Convert this to FAB component */}
-        <Stack
-          position="absolute"
-          bottom={0}
-          w="100%"
-          alignItems="flex-end"
-          right={0}
-          left={0}
-          pb={15}
-          pr={15}
-        >
-          <Button
-            width={80}
-            height={80}
-            borderRadius={40}
-            onPress={() => navigation.navigate("AddExerciseModal")}
-            elevation={15}
-            icon={<FontAwesome name="plus" size={24} color="black" />}
-          ></Button>
-        </Stack>
+        <FAB onPress={() => navigation.navigate("AddExerciseModal")} />
       </Stack>
     </SafeAreaView>
   );

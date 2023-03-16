@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import { TamaguiProvider, Theme } from "tamagui";
 import { DatabaseConnectionProvider } from "../context/DatabaseConnectionContext";
-import RootNavigation from "../navigation";
-
 import config from "@Root/tamagui.config";
 import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";

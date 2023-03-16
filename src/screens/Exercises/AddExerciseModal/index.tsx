@@ -1,18 +1,11 @@
 import { useDatabase } from "@App/hooks/useDatabase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { RootTabParamList } from "@Root/Navigation";
-import {
-  Box,
-  Button,
-  FormControl,
-  Heading,
-  Input,
-  Stack,
-  WarningOutlineIcon,
-} from "native-base";
+import { RootTabParamList } from "@App/Navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { SafeAreaView } from "react-native";
+import { Button, H1, H2, Input, Label, Stack } from "tamagui";
 
 // ─── Form ──────────────────────────────────────────────────────────────── ✣ ─
 
@@ -48,56 +41,45 @@ export default function AddExercise({ navigation }: AddExerciseModalProps) {
   };
 
   return (
-    <Box safeAreaTop>
-      <Stack p="4" space="4">
-        <Heading size="3xl">Add Exercise</Heading>
-        <Box
-          backgroundColor="gray.700"
-          pt="4"
-          pb="6"
-          px="4"
-          rounded="lg"
-          shadow="2"
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack m={15} space="$4">
+        <H1 color="$zinc50">Add Exercise</H1>
+        <Stack
+          backgroundColor="$zinc100"
+          p={15}
+          borderRadius={15}
         >
-          <FormControl isInvalid={!!errors.name}>
-            <FormControl.Label _text={{ bold: true, fontSize: "lg" }}>
+          <H2 color="$zinc800">Exercise name:</H2>
+            {/* <Label htmlFor="name">
               Exercise Name
-            </FormControl.Label>
-
+            </Label> */}
             <Controller
               name="name"
               control={control}
               rules={{ required: true }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
+                  id="name"
                   autoFocus
-                  size="2xl"
-                  h="12"
+                  size="$5"
+                  h={50}
                   placeholder="Name"
                   onChangeText={onChange}
                   onBlur={onBlur}
                   value={value}
-                  borderColor="violet.500"
+                  borderColor="red"
                 />
               )}
             />
-            <FormControl.ErrorMessage
-              leftIcon={<WarningOutlineIcon size="xs" />}
-            >
-              {errors.name?.message}
-            </FormControl.ErrorMessage>
-          </FormControl>
-        </Box>
+        </Stack>
         <Button
-          _text={{ fontSize: "lg", bold: true }}
-          backgroundColor="violet.500"
-          size="lg"
+          backgroundColor="violet"
+          size="$5"
           onPress={handleSubmit(onSubmit)}
-          shadow="2"
         >
           Add
         </Button>
       </Stack>
-    </Box>
+    </SafeAreaView>
   );
 }

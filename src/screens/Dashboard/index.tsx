@@ -1,58 +1,75 @@
-import { View, StyleSheet } from "react-native";
-import { Stack, XStack, YStack, ScrollView, Heading } from "tamagui";
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  RefreshControl,
+  Pressable,
+} from "react-native";
+import { Stack, XStack, YStack, ScrollView, Heading, Text } from "tamagui";
 
 function DashboardScreen() {
   return (
-    // <YStack fullscreen>
-        <ScrollView maxHeight={500}>
-          <YStack>
-            <YStack w="100%" padding={20}>
-              <Heading size={"$10"} style={styles.textShadowLarge} color="white">
-                {/* TODO Make this based on the time of day (Good monring, good afternoon, good evening) */}
-                Good Morning,
-              </Heading>
-              <Heading size="$10" style={styles.textShadowLarge} color="white">
-                {/* Allow user to enter name in settings personalization */}
-                Steven
-              </Heading>
-            </YStack>
-            {/* <Pressable>
-              {({ isPressed }) => {
-                return (
-                  <Box
-                    borderRadius="lg"
-                    bg={isPressed ? "indigo.500" : "indigo.400"}
-                    p="4"
-                    minH="40"
-                    shadow="lg"
-                  >
-                    <YStack space={2}>
-                      <Heading style={styles.textShadowSmall}>
-                        Your last workout
-                      </Heading>
-                      <Heading size="sm" style={styles.textShadowSmall}>
-                        2022-12-29 - Chest Day
-                      </Heading>
-                      <Text style={styles.textShadowSmall}>
-                        Bla bla text might go here, like if you did something
-                        notable like hit a new PR lift
-                      </Text>
-                    </YStack>
-                  </Box>
-                );
-              }}
-            </Pressable> */}
-            <XStack>
-              <Stack bg="white" flex={0.5} borderRadius={10} margin={15} padding={20} h={175}>
-                <Heading>Settings</Heading>
-              </Stack>
-              <Stack bg="white" flex={0.5} borderRadius={10} margin={15} padding={20} h={175}>
-                <Heading>Temp</Heading>
-              </Stack>
-            </XStack>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <YStack height="100%" p="$4" space="$3">
+          <YStack w="100%">
+            <Heading size={"$10"} style={styles.textShadowLarge} color="white">
+              {/* TODO Make this based on the time of day (Good morning, good afternoon, good evening) */}
+              Good Morning,
+            </Heading>
+            <Heading size="$10" style={styles.textShadowLarge} color="white">
+              {/* TODO Allow user to enter name in settings personalization */}
+              Steven
+            </Heading>
           </YStack>
-        </ScrollView>
-    // </YStack>
+          <Stack
+            borderRadius={15}
+            bg="$zinc100"
+            p={20}
+            minHeight={175}
+            animation="bouncy"
+            pressStyle={{ scale: 0.96, bg: "$zinc200" }}
+          >
+            <YStack space={2}>
+              <Heading style={styles.textShadowSmall}>
+                Your last workout
+              </Heading>
+              <Heading size="$5" style={styles.textShadowSmall}>
+                2022-12-29 - Chest Day
+              </Heading>
+              <Text style={styles.textShadowSmall}>
+                Bla bla text might go here, like if you did something notable
+                like hit a new PR lift
+              </Text>
+            </YStack>
+          </Stack>
+          <XStack space="$3">
+            <Stack
+              bg="$zinc100"
+              flex={0.5}
+              borderRadius={15}
+              padding={20}
+              h={175}
+              animation="bouncy"
+              pressStyle={{ scale: 0.96, bg: "$zinc200" }}
+            >
+              <Heading>Settings</Heading>
+            </Stack>
+            <Stack
+              bg="$zinc100"
+              flex={0.5}
+              borderRadius={15}
+              padding={20}
+              h={175}
+              animation="bouncy"
+              pressStyle={{ scale: 0.96, bg: "$zinc200" }}
+            >
+              <Heading>Temp</Heading>
+            </Stack>
+          </XStack>
+        </YStack>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

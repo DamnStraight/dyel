@@ -1,26 +1,35 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import { Control, Controller, useFieldArray } from "react-hook-form";
 import {
-  Box,
   Button,
-  Center,
-  Flex,
   Heading,
   Input,
+  Stack,
+  XStack,
+  YStack,
   Select,
-  VStack
-} from "native-base";
+  Sheet,
+  Adapt,
+} from "tamagui";
+import { SetType } from "../../data/entities/ExerciseSet";
 import {
-  Control,
-  Controller,
-  useFieldArray
-} from "react-hook-form";
-import { AddWorkoutFormValues, DEFAULT_SET, Set } from "../../screens/Workouts/AddWorkoutModal/types";
+  AddWorkoutFormValues,
+  DEFAULT_SET,
+  Set,
+} from "../../screens/Workouts/AddWorkoutModal/types";
+import { Entypo } from "@expo/vector-icons";
 
 interface ExerciseCardProps {
   exerciseName: string;
   exerciseIndex: number;
   control: Control<AddWorkoutFormValues>;
 }
+
+const options = [
+  { name: SetType.DROP },
+  { name: SetType.REGULAR },
+  { name: SetType.WARMUP },
+];
 
 const ExerciseSetCard = ({
   exerciseName,
@@ -45,121 +54,127 @@ const ExerciseSetCard = ({
   };
 
   return (
-    <>
-      <Box
-        borderWidth="1"
-        shadow="6"
-        borderColor="gray.700"
-        bg="gray.900"
-        p="2"
-        borderRadius="lg"
-      >
-        <VStack space={4}>
-          <Center>
-            <Heading>{exerciseName}</Heading>
-          </Center>
-          <Flex direction="row" h="6">
-            <Box flex={1} mx="1">
-              <Heading size="sm" textAlign="center">
-                Set
-              </Heading>
-            </Box>
-            <Box flex={1} mx="1">
-              <Heading size="sm" textAlign="center">
-                kg
-              </Heading>
-            </Box>
-            <Box flex={1} mx="1">
-              <Heading size="sm" textAlign="center">
-                Reps
-              </Heading>
-            </Box>
-          </Flex>
-          {fields.map((item, index) => (
-            <Flex direction="row" h="10" key={item.id}>
-              <Controller
-                name={`exercises.${exerciseIndex}.exerciseSets.${index}.type`}
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    flex={1}
-                    h="full"
-                    textAlign="center"
-                    dropdownIcon={<></>}
-                    borderColor="violet.500"
-                    defaultValue={item.type}
-                    onValueChange={(value) => {
-                      onChange(value);
-                    }}
-                    selectedValue={value}
-                    mx="1"
-                  >
-                    <Select.Item label="WARMUP" value="WARMUP" />
-                    <Select.Item
-                      label={String(
-                        item.type === "REGULAR" ? index + 1 : "REGULAR"
-                      )}
-                      value="REGULAR"
-                    />
-                    <Select.Item
-                      label="DROP"
-                      _text={{ fontWeight: "bold", color: "white" }}
-                      value="DROP"
-                    />
-                  </Select>
-                )}
-              />
-              <Controller
-                name={`exercises.${exerciseIndex}.exerciseSets.${index}.weight`}
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    bg="gray.800"
-                    keyboardType="numeric"
-                    size="md"
-                    textAlign="center"
-                    flex={1}
-                    mx="1"
-                    onChangeText={onChange}
-                    value={value}
-                    defaultValue={item.weight}
-                    placeholder={"0"}
-                  />
-                )}
-              />
-              <Controller
-                name={`exercises.${exerciseIndex}.exerciseSets.${index}.reps`}
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    bg="gray.800"
-                    keyboardType="numeric"
-                    size="md"
-                    textAlign="center"
-                    flex={1}
-                    mx="1"
-                    onChangeText={onChange}
-                    value={value}
-                    defaultValue={item.reps}
-                    placeholder={"0"}
-                  />
-                )}
-              />
-            </Flex>
-          ))}
-          <Button
-            leftIcon={<FontAwesome5 name="plus" size="sm" color="white" />}
-            bg="violet.600"
-            onPress={addSetHandler}
-          >
+    <YStack bg="red" p={15} borderRadius={20} m={10} spaceDirection="vertical" space="$2">
+      <Heading height={30} bg="green">
+        {exerciseName}
+      </Heading>
+      <XStack h={30}>
+        <Stack flex={0.33}>
+          <Heading size="$5" textAlign="center">
             Set
-          </Button>
-        </VStack>
-      </Box>
-    </>
+          </Heading>
+        </Stack>
+        <Stack flex={0.33}>
+          <Heading size="$5" textAlign="center">
+            kg
+          </Heading>
+        </Stack>
+        <Stack flex={0.33}>
+          <Heading size="$5" textAlign="center">
+            Reps
+          </Heading>
+        </Stack>
+      </XStack>
+      {fields.map((item, index) => (
+        <XStack h={50} key={item.id}>
+          <Controller
+            name={`exercises.${exerciseIndex}.exerciseSets.${index}.type`}
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value } }) => (
+              <Select
+                defaultValue={item.type}
+                onValueChange={(value) => {
+                  onChange(value);
+                }}
+                value={value}
+              >
+                <Select.Trigger
+                  flex={0.33}
+                  iconAfter={
+                    <Entypo name="chevron-small-down" size={24} color="black" />
+                  }
+                >
+                  <Select.Value placeholder="Something" />
+                </Select.Trigger>
+                <Adapt when="sm" platform="touch">
+                  <Sheet modal dismissOnSnapToBottom>
+                    <Sheet.Frame>
+                      <Sheet.ScrollView>
+                        <Adapt.Contents />
+                      </Sheet.ScrollView>
+                    </Sheet.Frame>
+                    <Sheet.Overlay />
+                  </Sheet>
+                </Adapt>
+                <Select.Content zIndex={200000}>
+                  <Select.Viewport bg="orange">
+                    <Select.Group>
+                      <Select.Label>{"HUH"}</Select.Label>
+                      {options.map((item, i) => {
+                        return (
+                          <Select.Item
+                            index={i}
+                            key={item.name}
+                            value={item.name}
+                          >
+                            <Select.ItemText>{item.name}</Select.ItemText>
+                          </Select.Item>
+                        );
+                      })}
+                    </Select.Group>
+                  </Select.Viewport>
+                </Select.Content>
+              </Select>
+            )}
+          />
+          <Controller
+            name={`exercises.${exerciseIndex}.exerciseSets.${index}.weight`}
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                keyboardType="numeric"
+                size="$5"
+                textAlign="center"
+                flex={0.33}
+                onChangeText={onChange}
+                value={value}
+                defaultValue={item.weight}
+                placeholder={"0"}
+              />
+            )}
+          />
+          <Controller
+            name={`exercises.${exerciseIndex}.exerciseSets.${index}.reps`}
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                keyboardType="numeric"
+                size="$5"
+                textAlign="center"
+                flex={0.33}
+                onChangeText={onChange}
+                value={value}
+                defaultValue={item.reps}
+                placeholder={"0"}
+              />
+            )}
+          />
+        </XStack>
+      ))}
+      <XStack bg="pink">
+        <Button
+          w="100%"
+          icon={<FontAwesome5 name="plus" size={24} color="white" />}
+          bg="red"
+          onPress={addSetHandler}
+        >
+          Set
+        </Button>
+      </XStack>
+    </YStack>
   );
 };
 

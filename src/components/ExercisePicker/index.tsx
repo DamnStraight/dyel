@@ -1,16 +1,12 @@
-import { StaticModal as Modal } from "@App/components/StaticModal";
 import { ExerciseModel } from "@App/data/entities/Exercise";
-import {
-  Box,
-  Button,
-  Center,
-  FlatList,
-  Heading,
-  Pressable, Stack,
-  Text
-} from "native-base";
 import { useState } from "react";
-import { ListRenderItem } from "react-native";
+import {
+  FlatList,
+  ListRenderItem,
+  Pressable,
+  SafeAreaView,
+} from "react-native";
+import { Button, Dialog, Heading, Stack, Text, YStack } from "tamagui";
 
 type ExercisePickerProps = {
   onSubmit: (exercise: ExerciseModel) => void;
@@ -18,7 +14,11 @@ type ExercisePickerProps = {
   exercises: ExerciseModel[];
 };
 
-function ExercisePicker({ onClose, onSubmit, exercises = [] }: ExercisePickerProps) {
+function ExercisePicker({
+  onClose,
+  onSubmit,
+  exercises = [],
+}: ExercisePickerProps) {
   const [selectedExercise, setSelectedExercise] = useState<number | null>(null);
 
   const renderItem: ListRenderItem<ExerciseModel> = ({ item, index }) => (
@@ -27,41 +27,65 @@ function ExercisePicker({ onClose, onSubmit, exercises = [] }: ExercisePickerPro
         setSelectedExercise(index);
       }}
     >
-      <Box
-        w="full"
-        p="3"
-        rounded="lg"
-        bg={selectedExercise === index ? "violet.400" : "gray.700"}
-        shadow="2"
-        my="1"
+      <Stack
+        p={5}
+        h={50}
+        borderRadius={30}
+        bg={selectedExercise === index ? "red" : "blue"}
+        my={5}
       >
         <Stack>
-          <Heading size="md">{item.name}</Heading>
+          <Heading size="$5" color="black">
+            {item.name}
+          </Heading>
           <Text>Sample description blabla</Text>
         </Stack>
-      </Box>
+      </Stack>
     </Pressable>
   );
 
   return (
-    <Center>
-      <Modal isOpen={true} onClose={onClose}>
-        <Modal.Content w="90%" maxH="80%">
-          <Modal.Body maxH="500px">
-            <>
-              <Heading>Exercises</Heading>
-              <FlatList
-                data={exercises}
-                renderItem={renderItem}
-                keyExtractor={(item) => String(item.id)}
-              ></FlatList>
-            </>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button variant="ghost" colorScheme="blueGray" onPress={onClose}>
-                Cancel
-              </Button>
+    <Dialog modal open={true} onOpenChange={onClose}>
+      {/* <Adapt when="xl" platform="native">
+        <Sheet zIndex={200000} modal dismissOnSnapToBottom>
+          <Sheet.Frame padding="$4" space>
+            <Adapt.Contents />
+          </Sheet.Frame>
+          <Sheet.Overlay />
+        </Sheet>
+      </Adapt> */}
+      <Dialog.Portal my={150} mx={25}>
+        <Dialog.Content
+          borderRadius={25}
+          marginTop={75}
+          elevate
+          w="100%"
+          h="100%"
+          key="content"
+          animation={[
+            "quick",
+            {
+              opacity: {
+                overshootClamping: true,
+              },
+            },
+          ]}
+          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+          space
+        >
+          <YStack flex={1} bg="blue">
+            <Dialog.Title>Exercises</Dialog.Title>
+            <Stack flex={1} bg="red">
+                          <FlatList
+              data={exercises}
+              renderItem={renderItem}
+              keyExtractor={(item) => String(item.id)}
+            />
+            </Stack>
+
+            <Stack position="absolute" bottom={0} width="100%">
+              <Button onPress={onClose}>Cancel</Button>
               <Button
                 disabled={selectedExercise === null}
                 onPress={() => {
@@ -70,11 +94,11 @@ function ExercisePicker({ onClose, onSubmit, exercises = [] }: ExercisePickerPro
               >
                 Save
               </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-    </Center>
+            </Stack>
+          </YStack>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   );
 }
 
