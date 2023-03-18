@@ -1,16 +1,19 @@
 import ExercisePicker from "@App/components/ExercisePicker";
 import { ExerciseModel } from "@App/data/entities/Exercise";
 import { useDatabase } from "@App/hooks/useDatabase";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootWorkoutStackParamList } from "@App/Navigation";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
+import {
+  Button,
+  H1, H4,
+  Input, ScrollView, XStack,
+  YStack
+} from "tamagui";
 import ExerciseSetCard from "../../../components/ExerciseSetCard";
 import { AddWorkoutFormValues, DEFAULT_SET } from "./types";
-import { SafeAreaView } from "react-native";
-import { Button, Heading, Input, ScrollView, Stack, YStack } from "tamagui";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
@@ -24,7 +27,7 @@ interface AddWorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamLi
     - Add haptic feedback to UI
     - Resize elements to be more mobile ergonomic  
 */
-function AddWorkoutModal({ navigation }: AddWorkoutProps) {
+function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
@@ -122,35 +125,43 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
   );
 
   return (
-    <>
-      <ScrollView fullscreen>
-        <YStack height="100%" w="100%" space="$4">
-          <Heading size="$10" style={styles.header}>
-            Create Workout
-          </Heading>
-          <Controller
-            name={`workoutName`}
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { onChange, value } }) => (
-              <Input
-                placeholder="Leg Day"
-                onChangeText={onChange}
-                value={value}
-                size="$5"
-              />
-            )}
-          />
-
-          <Button
-            disabled={isLoading}
-            onPress={() => setShowModal(true)}
-            bg="blue"
-            icon={<FontAwesome5 name="dumbbell" size={16} color="white" />}
-          >
-            Add Exercise
-          </Button>
-          <Stack>
+    <SafeAreaView style={{ flex: 1 }}>
+      <XStack p="$2">
+        {/* <Button
+          als="center"
+          justifyContent="center"
+          h={50}
+          w={50}
+          onPress={() => navigation.goBack()}
+          icon={<Entypo name="chevron-left" size={20} color="black" />}
+          animation="bouncy"
+          pressStyle={{ bg: "$zinc200", scale: 0.96 }}
+        >
+          {" "}
+        </Button> */}
+        <H1 flex={1} textAlign="center" color="$zinc200" style={styles.header}>
+          Create Workout
+        </H1>
+      </XStack>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <YStack height="100%" w="100%" space="$4" p="$4">
+          <YStack bg="$zinc200" borderRadius={25} p="$4" space="$2">
+            <H4>Workout Name:</H4>
+            {/* <Label bg="red" htmlFor="workoutName">Workout Name:</Label> */}
+            <Controller
+              name={`workoutName`}
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Leg Day"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+          </YStack>
+          <YStack space="$4">
             {fields.map((item, index) => (
               <ExerciseSetCard
                 exerciseName={item.name}
@@ -159,28 +170,44 @@ function AddWorkoutModal({ navigation }: AddWorkoutProps) {
                 {...{ control }}
               />
             ))}
-          </Stack>
-          {validWorkout && (
-            <YStack position="absolute" bottom={0} width="100%" height={50}>
-              <Button
-                disabled={isLoading}
-                onPress={handleSubmit(onSubmit, onInvalid)}
-                bg="blue"
-              >
-                Save Workout
-              </Button>
-            </YStack>
-          )}
+          </YStack>
         </YStack>
       </ScrollView>
-      {showModal && (
+      <YStack p="$4" w="100%" space="$3">
         <ExercisePicker
           exercises={availableExercises}
-          onClose={() => setShowModal(false)}
           onSubmit={addExerciseHandler}
         />
-      )}
-    </>
+        <XStack space="$3">
+          {/* TODO Add Confirmation dialog if data is set */}
+          <Button
+            flex={0.5}
+            size="$5"
+            h={50}
+            borderRadius={10}
+            disabled={isLoading}
+            onPress={() => {
+              reset();
+              navigation.goBack();
+            }}
+            theme="red_Button"
+          >
+            Cancel
+          </Button>
+          <Button
+            flex={0.5}
+            size="$5"
+            h={50}
+            borderRadius={10}
+            disabled={isLoading}
+            onPress={handleSubmit(onSubmit, onInvalid)}
+            theme="green_Button"
+          >
+            Save Workout
+          </Button>
+        </XStack>
+      </YStack>
+    </SafeAreaView>
   );
 }
 

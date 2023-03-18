@@ -5,7 +5,15 @@ import {
   RefreshControl,
   Pressable,
 } from "react-native";
-import { Stack, XStack, YStack, ScrollView, Heading, Text } from "tamagui";
+import {
+  Stack,
+  XStack,
+  YStack,
+  ScrollView,
+  Heading,
+  Text,
+  Button,
+} from "tamagui";
 
 function DashboardScreen() {
   return (
@@ -69,6 +77,26 @@ function DashboardScreen() {
           </XStack>
         </YStack>
       </ScrollView>
+      <Stack
+        position="absolute"
+        bottom={0}
+        right={0}
+        mb={25}
+        mr={25}
+        flex={1}
+        alignItems="flex-end"
+      >
+        <Button
+          flex={0.4}
+          bg="$indigo600"
+          h={75}
+          color="white"
+          pressStyle={{ bg: "$indigo900" }}
+          borderRadius={40}
+        >
+          Start a workout
+        </Button>
+      </Stack>
     </SafeAreaView>
   );
 }

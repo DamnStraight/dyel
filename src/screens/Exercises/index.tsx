@@ -5,16 +5,15 @@ import { FontAwesome } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { Button, Heading, ScrollView, Stack, Text, YStack, H1 } from "tamagui";
+import { Button, H2, ScrollView, Stack, Text, YStack, H1 } from "tamagui";
 import FAB from "../../components/FAB";
+import { CreateExerciseModal } from "./CreateExerciseModal";
 
-function ExerciseCard({ name }: { name: string }) {
+function ExerciseCard({ name }: Pick<ExerciseModel, "name">) {
   return (
-    <YStack padding={10} borderRadius={13} elevation={10} bg="white">
+    <YStack padding={15} borderRadius={15} elevation={5} bg="white">
       <YStack>
-        <Heading size="$5" color="black">
-          {name}
-        </Heading>
+        <H2 color="black">{name}</H2>
         <Text>Sample description blabla</Text>
       </YStack>
     </YStack>
@@ -74,7 +73,12 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
             </Stack>
           </ScrollView>
         </YStack>
-        <FAB onPress={() => navigation.navigate("AddExerciseModal")} />
+        {/* <FAB
+          color="$indigo700"
+          iconColor="white"
+          onPress={() => navigation.navigate("AddExerciseModal")}
+        /> */}
+        <CreateExerciseModal onSuccess={(exercise) => setExercises([...exercises, exercise])} />
       </Stack>
     </SafeAreaView>
   );

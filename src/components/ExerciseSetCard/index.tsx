@@ -54,8 +54,8 @@ const ExerciseSetCard = ({
   };
 
   return (
-    <YStack bg="red" p={15} borderRadius={20} m={10} spaceDirection="vertical" space="$2">
-      <Heading height={30} bg="green">
+    <YStack bg="$zinc200" p={15} borderRadius={20} spaceDirection="vertical" space="$2">
+      <Heading height={30} textAlign="center">
         {exerciseName}
       </Heading>
       <XStack h={30}>
@@ -76,7 +76,7 @@ const ExerciseSetCard = ({
         </Stack>
       </XStack>
       {fields.map((item, index) => (
-        <XStack h={50} key={item.id}>
+        <XStack h={50} key={item.id} space="$2">
           <Controller
             name={`exercises.${exerciseIndex}.exerciseSets.${index}.type`}
             control={control}
@@ -91,9 +91,7 @@ const ExerciseSetCard = ({
               >
                 <Select.Trigger
                   flex={0.33}
-                  iconAfter={
-                    <Entypo name="chevron-small-down" size={24} color="black" />
-                  }
+                  h={20}
                 >
                   <Select.Value placeholder="Something" />
                 </Select.Trigger>
@@ -110,7 +108,7 @@ const ExerciseSetCard = ({
                 <Select.Content zIndex={200000}>
                   <Select.Viewport bg="orange">
                     <Select.Group>
-                      <Select.Label>{"HUH"}</Select.Label>
+                      <Select.Label>{"Set Type"}</Select.Label>
                       {options.map((item, i) => {
                         return (
                           <Select.Item
@@ -164,12 +162,14 @@ const ExerciseSetCard = ({
           />
         </XStack>
       ))}
-      <XStack bg="pink">
+      <XStack>
         <Button
           w="100%"
-          icon={<FontAwesome5 name="plus" size={24} color="white" />}
-          bg="red"
+          bg="$indigo500"
+          color="white"
           onPress={addSetHandler}
+          pressStyle={{ bg: "$indigo700"}}
+          animation="quick"
         >
           Set
         </Button>

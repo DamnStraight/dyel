@@ -1,62 +1,71 @@
 import { ExerciseModel } from "@App/data/entities/Exercise";
-import { useState } from "react";
 import {
-  FlatList,
-  ListRenderItem,
-  Pressable,
-  SafeAreaView,
-} from "react-native";
-import { Button, Dialog, Heading, Stack, Text, YStack } from "tamagui";
+  BottomTabNavigationProp,
+  BottomTabScreenProps,
+} from "@react-navigation/bottom-tabs";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigatorProps } from "@react-navigation/native-stack/lib/typescript/src/types";
+import { useState } from "react";
+import { FlatList, ListRenderItem } from "react-native";
+import { Button, Dialog, H3, H4, Input, Stack, XStack, YStack } from "tamagui";
+import { RootTabParamList } from "../../navigation";
+import FAB from "../FAB";
 
 type ExercisePickerProps = {
   onSubmit: (exercise: ExerciseModel) => void;
-  onClose: () => void;
   exercises: ExerciseModel[];
 };
 
-function ExercisePicker({
-  onClose,
-  onSubmit,
-  exercises = [],
-}: ExercisePickerProps) {
+function ExercisePicker({ onSubmit, exercises = [] }: ExercisePickerProps) {
+  const [open, setOpen] = useState<boolean>(false);
   const [selectedExercise, setSelectedExercise] = useState<number | null>(null);
+  const [search, setSearch] = useState<string>("");
+  const navigation = useNavigation<NavigationProp<RootTabParamList>>();
+
+  const handleNavigateToExercise = () => {
+    setOpen(false);
+    navigation.navigate("Exercises", { screen: "ExerciseScreen" });
+  };
 
   const renderItem: ListRenderItem<ExerciseModel> = ({ item, index }) => (
-    <Pressable
+    <Stack
+      mt={index === 0 ? 0 : "$2"}
+      p="$3"
+      borderRadius={10}
+      bg={selectedExercise === index ? "$indigo500" : "$zinc200"}
       onPress={() => {
-        setSelectedExercise(index);
+        const thisSelected = selectedExercise === index;
+        setSelectedExercise(thisSelected ? null : index);
       }}
     >
-      <Stack
-        p={5}
-        h={50}
-        borderRadius={30}
-        bg={selectedExercise === index ? "red" : "blue"}
-        my={5}
-      >
-        <Stack>
-          <Heading size="$5" color="black">
-            {item.name}
-          </Heading>
-          <Text>Sample description blabla</Text>
-        </Stack>
-      </Stack>
-    </Pressable>
+      <H4 color="black" textAlign="center">
+        {item.name}
+      </H4>
+    </Stack>
   );
 
   return (
-    <Dialog modal open={true} onOpenChange={onClose}>
-      {/* <Adapt when="xl" platform="native">
-        <Sheet zIndex={200000} modal dismissOnSnapToBottom>
-          <Sheet.Frame padding="$4" space>
-            <Adapt.Contents />
-          </Sheet.Frame>
-          <Sheet.Overlay />
-        </Sheet>
-      </Adapt> */}
-      <Dialog.Portal my={150} mx={25}>
+    <Dialog modal open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        {/* <FAB stackStyle={{ mr: 30, mb: 75 }} color="$indigo700" iconColor="white" /> */}
+        <Button size="$5" h={50} color="white" bg="$indigo700">
+          Add Exercise
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Portal py={150} px={25}>
+        <Dialog.Overlay
+          zIndex={1}
+          onPress={() => setOpen(false)}
+          bg="$zinc900"
+          key="overlay"
+          animation="quick"
+          o={0.8}
+          enterStyle={{ o: 0 }}
+          exitStyle={{ o: 0 }}
+        />
         <Dialog.Content
-          borderRadius={25}
+          zIndex={2}
+          borderRadius={20}
           marginTop={75}
           elevate
           w="100%"
@@ -74,27 +83,60 @@ function ExercisePicker({
           exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
           space
         >
-          <YStack flex={1} bg="blue">
+          <YStack flex={1} space="$3">
             <Dialog.Title>Exercises</Dialog.Title>
-            <Stack flex={1} bg="red">
-                          <FlatList
-              data={exercises}
-              renderItem={renderItem}
-              keyExtractor={(item) => String(item.id)}
-            />
+            <YStack flex={1} my="$2" space="$2">
+              {exercises.length === 0 ? (
+                <Stack flex={1} justifyContent="center">
+                  <H3
+                    color="$zinc600"
+                    opacity={0.3}
+                    textAlign="center"
+                  >{`Nothing here... :(`}</H3>
+                  <Button onPress={handleNavigateToExercise}>
+                    Add Exercise
+                  </Button>
+                </Stack>
+              ) : (
+                <FlatList
+                  data={exercises.filter((exercise) =>
+                    exercise.name.toLowerCase().includes(search.toLowerCase())
+                  )}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => String(item.id)}
+                />
+              )}
+            </YStack>
+            <Stack>
+              <Input
+                placeholder="Search..."
+                textAlign="center"
+                borderWidth={0}
+                value={search}
+                onChangeText={(value) => setSearch(value)}
+              />
             </Stack>
-
-            <Stack position="absolute" bottom={0} width="100%">
-              <Button onPress={onClose}>Cancel</Button>
+            <XStack space="$2">
               <Button
+                flex={0.5}
+                onPress={() => setOpen(false)}
+                theme="red_Button"
+              >
+                Cancel
+              </Button>
+              <Button
+                theme="green_Button"
+                flex={0.5}
                 disabled={selectedExercise === null}
                 onPress={() => {
                   onSubmit(exercises[selectedExercise!]);
+                  setSelectedExercise(null);
+                  setOpen(false);
                 }}
               >
                 Save
               </Button>
-            </Stack>
+            </XStack>
           </YStack>
         </Dialog.Content>
       </Dialog.Portal>

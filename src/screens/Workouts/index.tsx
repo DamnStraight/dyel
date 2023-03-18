@@ -2,10 +2,9 @@ import { RootWorkoutStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { Button, H1, Heading, ScrollView, Stack } from "tamagui";
-import { useDatabase } from "../../hooks/useDatabase";
-import { FontAwesome } from "@expo/vector-icons";
+import { H1, Heading, ScrollView, Stack } from "tamagui";
 import FAB from "../../components/FAB";
+import { useDatabase } from "../../hooks/useDatabase";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
 // prettier-ignore
@@ -55,8 +54,7 @@ function WorkoutScreen({ navigation }: WorkoutProps) {
           </Stack>
         </Stack>
       </ScrollView>
-      {/* TODO Convert this to FAB component */}
-      <FAB onPress={() => navigation.navigate("AddWorkoutModal")} />
+      <FAB color="$indigo700" iconColor="white" onPress={() => navigation.navigate("AddWorkoutModal")} />
     </SafeAreaView>
   );
 }

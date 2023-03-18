@@ -1,19 +1,29 @@
-import { FontAwesome5 } from "@expo/vector-icons";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import DashboardScreen from "@App/screens/Dashboard";
 import ExerciseScreen from "@App/screens/Exercises";
-import AddExerciseModal from "@App/screens/Exercises/AddExerciseModal";
 import HistoryScreen from "@App/screens/History";
 import WorkoutScreen from "@App/screens/Workouts";
-import AddWorkoutModal from "@App/screens/Workouts/AddWorkoutModal/AddWorkoutModal";
+import AddWorkoutModal from "@App/screens/Workouts/AddWorkoutModal";
+import { FontAwesome5 } from "@expo/vector-icons";
+import {
+  BottomTabScreenProps,
+  createBottomTabNavigator
+} from "@react-navigation/bottom-tabs";
+import {
+  DefaultTheme,
+  getFocusedRouteNameFromRoute,
+  NavigationContainer,
+  NavigatorScreenParams
+} from "@react-navigation/native";
+import {
+  createNativeStackNavigator, NativeStackScreenProps
+} from "@react-navigation/native-stack";
+import { useLayoutEffect } from "react";
 
 const NavigationTheme = {
   ...DefaultTheme,
   colors: {
     primary: "white",
-    background: "#27272a",
+    background: "#18181b",
     card: "#18181b",
     text: "#fafafa",
     border: "#3f3f46",
@@ -25,7 +35,6 @@ const NavigationTheme = {
 
 export type RootExerciseStackParamList = {
   ExerciseScreen: undefined;
-  AddExerciseModal: undefined;
 };
 
 const ExerciseStack = createNativeStackNavigator<RootExerciseStackParamList>();
@@ -37,13 +46,6 @@ function ExerciseStackNavigation() {
         <ExerciseStack.Screen
           name="ExerciseScreen"
           component={ExerciseScreen}
-        />
-      </ExerciseStack.Group>
-      <ExerciseStack.Group>
-        {/* <ExerciseStack.Group screenOptions={{ presentation: "fullScreenModal" }}> */}
-        <ExerciseStack.Screen
-          name="AddExerciseModal"
-          component={AddExerciseModal}
         />
       </ExerciseStack.Group>
     </ExerciseStack.Navigator>
@@ -59,7 +61,20 @@ export type RootWorkoutStackParamList = {
 
 const WorkoutStack = createNativeStackNavigator<RootWorkoutStackParamList>();
 
-function WorkoutStackNavigation() {
+function WorkoutStackNavigation({
+  navigation,
+  route,
+}: BottomTabScreenProps<RootTabParamList>) {
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route);
+
+    if (routeName === "AddWorkoutModal") {
+      navigation.setOptions({ tabBarStyle: { display: "none", height: 0, width: 0 , backgroundColor: 'transparent' } });
+    } else {
+      navigation.setOptions({ tabBarStyle: { display: "flex", height: 95 } });
+    }
+  }, [navigation, route]);
+
   return (
     <WorkoutStack.Navigator>
       <WorkoutStack.Group screenOptions={{ headerShown: false }}>
@@ -70,6 +85,10 @@ function WorkoutStackNavigation() {
         <WorkoutStack.Screen
           name="AddWorkoutModal"
           component={AddWorkoutModal}
+          options={{
+            title: "Create Workout",
+            headerShown: false
+          }}
         />
       </WorkoutStack.Group>
     </WorkoutStack.Navigator>
@@ -80,10 +99,9 @@ function WorkoutStackNavigation() {
 
 export type RootTabParamList = {
   Dashboard: undefined;
-  Exercises: undefined;
+  Exercises: NavigatorScreenParams<RootExerciseStackParamList>;
   Workouts: undefined;
   History: undefined;
-  AddExerciseModal: undefined;
 };
 
 const RootTab = createBottomTabNavigator<RootTabParamList>();
@@ -99,6 +117,7 @@ export default function RootNavigation() {
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="tachometer-alt" size={size} color={color} />
               ),
+              unmountOnBlur: true
             }}
             name="Dashboard"
             component={DashboardScreen}
@@ -109,6 +128,7 @@ export default function RootNavigation() {
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="dumbbell" size={size} color={color} />
               ),
+              unmountOnBlur: true
             }}
             name="Exercises"
             component={ExerciseStackNavigation}
@@ -118,6 +138,7 @@ export default function RootNavigation() {
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="running" size={size} color={color} />
               ),
+              unmountOnBlur: true
             }}
             name="Workouts"
             component={WorkoutStackNavigation}
