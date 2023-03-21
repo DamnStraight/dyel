@@ -5,7 +5,7 @@ import AppDataSource from "@App/data/AppDataSource";
 export type ExerciseSlice = {
   exercises: ExerciseModel[];
   setExercises: (exercises: ExerciseModel[]) => void;
-  addExercises: (exercise: ExerciseModel) => void;
+  addExercise: (exercise: ExerciseModel) => void;
   fetchExercises: () => Promise<void>;
 };
 
@@ -21,10 +21,10 @@ export const createExerciseSlice: StateCreator<
       ...state,
       exercises,
     })),
-  addExercises: (exercise) =>
+  addExercise: (exercise) =>
     set((state) => ({
       ...state,
-      workouts: [...state.exercises, exercise],
+      exercises: [...state.exercises, exercise],
     })),
   fetchExercises: async () => {
     const exerciseRepository = AppDataSource.getRepository(ExerciseModel);

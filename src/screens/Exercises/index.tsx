@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
 import { Button, H2, ScrollView, Stack, Text, YStack, H1 } from "tamagui";
 import FAB from "../../components/FAB";
+import { useBoundStore } from "../../store";
 import { CreateExerciseModal } from "./CreateExerciseModal";
 
 function ExerciseCard({ name }: Pick<ExerciseModel, "name">) {
@@ -26,30 +27,18 @@ interface ExerciseProps extends NativeStackScreenProps<RootExerciseStackParamLis
 
 export default function ExerciseScreen({ navigation }: ExerciseProps) {
   const { exerciseRepository } = useDatabase();
-  const [exercises, setExercises] = useState<ExerciseModel[]>([]);
   const [isRefreshing, setRefreshing] = useState<boolean>(false);
+  const { exercises, fetchExercises, addExercise } = useBoundStore(
+    ({ exercises, fetchExercises, addExercise }) => ({ exercises, fetchExercises, addExercise })
+  );
 
-  useEffect(() => {
-    // Refresh the exercise list whenever the screen comes back into focus
-    const unsubscribe = navigation.addListener("focus", () => {
-      exerciseRepository.getAll().then(setExercises);
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const onRefresh = useCallback(async () => {
+  const onRefresh = async () => {
     setRefreshing(true);
 
-    try {
-      const result = await exerciseRepository.getAll();
-      setExercises(result);
-    } catch (e) {
-      console.log(e);
-    }
+    await fetchExercises();
 
     setRefreshing(false);
-  }, []);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -78,7 +67,9 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
           iconColor="white"
           onPress={() => navigation.navigate("AddExerciseModal")}
         /> */}
-        <CreateExerciseModal onSuccess={(exercise) => setExercises([...exercises, exercise])} />
+        <CreateExerciseModal
+          onSuccess={(exercise) => addExercise(exercise)}
+        />
       </Stack>
     </SafeAreaView>
   );
