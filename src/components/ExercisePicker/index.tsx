@@ -134,7 +134,7 @@ function ExercisePicker({ onSubmit, exercises = [] }: ExercisePickerProps) {
                   setOpen(false);
                 }}
               >
-                Save
+                Add
               </Button>
             </XStack>
           </YStack>

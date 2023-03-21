@@ -4,7 +4,7 @@ import { useDatabase } from "@App/hooks/useDatabase";
 import { RootWorkoutStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useMemo, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { SafeAreaView, StyleSheet } from "react-native";
 import { Button, H1, H4, Input, ScrollView, XStack, YStack } from "tamagui";
 import ExerciseSetCard from "../../../components/ExerciseSetCard";
@@ -26,8 +26,9 @@ interface AddWorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamLi
 function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
-  const [exercises, setExercises] = useState<ExerciseModel[]>([]);
-  const addWorkout = useBoundStore((state) => state.addWorkout);
+  const { exercises, addWorkout } = useBoundStore(
+    ({ exercises, addWorkout }) => ({ exercises, addWorkout })
+  );
 
   const {
     control,
@@ -62,19 +63,6 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
     useDatabase();
 
   const validWorkout = fields.length !== 0;
-
-  useEffect(() => {
-    async function queryExercises() {
-      setLoading(true);
-
-      const exercises = await exerciseRepository.getAll();
-
-      setExercises(exercises);
-      setLoading(false);
-    }
-
-    queryExercises();
-  }, []);
 
   const addExerciseHandler = (exercise: ExerciseModel) => {
     append({ ...exercise, exerciseSets: [{ ...DEFAULT_SET }] });
@@ -115,15 +103,11 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
   };
 
   // Only show exercises that haven't already been picked
-  const availableExercises = useMemo(
-    () =>
-      exercises.filter(
-        (exercise) =>
-          !(getValues("exercises") as any).some((item: any) => {
-            return item.id === exercise.id;
-          })
-      ),
-    [exercises, getValues]
+  const availableExercises = exercises.filter(
+    (exercise) =>
+      !(getValues("exercises") as any).some((item: any) => {
+        return item.id === exercise.id;
+      })
   );
 
   return (
