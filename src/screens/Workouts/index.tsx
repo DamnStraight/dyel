@@ -1,11 +1,10 @@
+import { WorkoutModel } from "@App/data/entities/Workout";
 import { RootWorkoutStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { H1, H2, Heading, ScrollView, Stack, YStack } from "tamagui";
+import { H1, H2, ScrollView, Stack, YStack } from "tamagui";
 import FAB from "../../components/FAB";
-import { useDatabase } from "../../hooks/useDatabase";
-import { WorkoutModel } from "@App/data/entities/Workout";
 import { useBoundStore } from "../../store";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─

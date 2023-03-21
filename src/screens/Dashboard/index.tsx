@@ -1,18 +1,9 @@
 import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  RefreshControl,
-  Pressable,
+  SafeAreaView, StyleSheet
 } from "react-native";
 import {
-  Stack,
-  XStack,
-  YStack,
-  ScrollView,
-  Heading,
-  Text,
-  Button,
+  Button, Heading, ScrollView, Stack, Text, XStack,
+  YStack
 } from "tamagui";
 
 function DashboardScreen() {

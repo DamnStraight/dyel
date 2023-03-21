@@ -1,12 +1,10 @@
 import { ExerciseModel } from "@App/data/entities/Exercise";
 import { useDatabase } from "@App/hooks/useDatabase";
 import { RootExerciseStackParamList } from "@App/Navigation";
-import { FontAwesome } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { Button, H2, ScrollView, Stack, Text, YStack, H1 } from "tamagui";
-import FAB from "../../components/FAB";
+import { H1, H2, ScrollView, Stack, Text, YStack } from "tamagui";
 import { useBoundStore } from "../../store";
 import { CreateExerciseModal } from "./CreateExerciseModal";
 
@@ -29,7 +27,11 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
   const { exerciseRepository } = useDatabase();
   const [isRefreshing, setRefreshing] = useState<boolean>(false);
   const { exercises, fetchExercises, addExercise } = useBoundStore(
-    ({ exercises, fetchExercises, addExercise }) => ({ exercises, fetchExercises, addExercise })
+    ({ exercises, fetchExercises, addExercise }) => ({
+      exercises,
+      fetchExercises,
+      addExercise,
+    })
   );
 
   const onRefresh = async () => {
@@ -67,9 +69,7 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
           iconColor="white"
           onPress={() => navigation.navigate("AddExerciseModal")}
         /> */}
-        <CreateExerciseModal
-          onSuccess={(exercise) => addExercise(exercise)}
-        />
+        <CreateExerciseModal onSuccess={(exercise) => addExercise(exercise)} />
       </Stack>
     </SafeAreaView>
   );
