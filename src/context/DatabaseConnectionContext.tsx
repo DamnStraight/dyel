@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { Heading, Spinner, Stack } from "tamagui";
 import { ExerciseSetRepository } from "../data/repositories/ExerciseSetRepository";
+import { useBoundStore } from "../store";
 
 interface DatabaseConnectionContextRepos {
   exerciseRepository: ExerciseRepository;
@@ -31,10 +32,17 @@ function delay(ms: number) {
 // prettier-ignore
 export const DatabaseConnectionProvider: React.FC<{ children: ReactNode }> = ({ children, }) => {
   const [isInitialized, setInitialized] = useState<boolean>(false);
+  const fetchWorkouts = useBoundStore((state) => state.fetchWorkouts);
+  const fetchExercises = useBoundStore((state) => state.fetchExercises);
 
   const initializeDataSource = useCallback(async () => {
     try {
       await AppDataSource.initialize();
+
+      // Initialize store
+      await fetchWorkouts();
+      await fetchExercises();
+
     } catch (e) {
       console.log(e)
     }

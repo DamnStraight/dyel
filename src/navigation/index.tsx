@@ -57,6 +57,7 @@ function ExerciseStackNavigation() {
 export type RootWorkoutStackParamList = {
   WorkoutScreen: undefined;
   AddWorkoutModal: undefined;
+  ActiveWorkoutModal: undefined;
 };
 
 const WorkoutStack = createNativeStackNavigator<RootWorkoutStackParamList>();
@@ -100,7 +101,7 @@ function WorkoutStackNavigation({
 export type RootTabParamList = {
   Dashboard: undefined;
   Exercises: NavigatorScreenParams<RootExerciseStackParamList>;
-  Workouts: undefined;
+  Workouts: NavigatorScreenParams<RootWorkoutStackParamList>;
   History: undefined;
 };
 

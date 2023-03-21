@@ -21,9 +21,8 @@ export const Provider: FCC = ({ children }) => {
     <TamaguiProvider config={config}>
       <Theme name={colorScheme === "dark" ? "dark" : "light"}>
         <DatabaseConnectionProvider>
-        <Suspense>
-          {children}
-        </Suspense></DatabaseConnectionProvider>
+          <Suspense>{children}</Suspense>
+        </DatabaseConnectionProvider>
       </Theme>
     </TamaguiProvider>
   );

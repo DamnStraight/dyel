@@ -6,13 +6,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { SafeAreaView, StyleSheet } from "react-native";
-import {
-  Button,
-  H1, H4,
-  Input, ScrollView, XStack,
-  YStack
-} from "tamagui";
+import { Button, H1, H4, Input, ScrollView, XStack, YStack } from "tamagui";
 import ExerciseSetCard from "../../../components/ExerciseSetCard";
+import { useBoundStore } from "../../../store";
 import { AddWorkoutFormValues, DEFAULT_SET } from "./types";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
@@ -31,6 +27,7 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [exercises, setExercises] = useState<ExerciseModel[]>([]);
+  const addWorkout = useBoundStore((state) => state.addWorkout);
 
   const {
     control,
@@ -51,8 +48,10 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
     name: "exercises",
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: AddWorkoutFormValues) => {
+    await saveWorkout(data);
+    reset();
+    navigation.goBack();
   };
 
   const onInvalid = (data: any) => {
@@ -83,30 +82,33 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
     setShowModal(false);
   };
 
-  const saveWorkout = async () => {
+  const saveWorkout = async (formData: AddWorkoutFormValues) => {
+    const { workoutName, exercises } = formData;
     try {
       // Create the new workout
       let workoutEntity = await workoutRepository.create(
-        getValues("workoutName"),
+        workoutName,
         availableExercises
       );
 
       // Create and store the sets linked to both the workout and the exercise (Cascade)
-      const exerciseSetEntities = getValues("exercises").map((exercise, _) => [
+      const exerciseSetEntities = exercises.flatMap((exercise, _) => [
         ...exercise.exerciseSets.map((set, index) => ({
           ...set,
           exercise: { ...exercise, workouts: [workoutEntity] },
           workout: workoutEntity,
-          position: index,
+          position: index + 1,
         })),
       ]);
 
       const savedSetEntities = await exerciseSetRepository.create(
         exerciseSetEntities as any
       );
+
       workoutEntity.sets = savedSetEntities;
       workoutEntity = await workoutRepository.save(workoutEntity);
-      navigation.goBack();
+
+      await addWorkout(workoutEntity);
     } catch (e) {
       console.log(e);
     }
@@ -199,7 +201,7 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
             size="$5"
             h={50}
             borderRadius={10}
-            disabled={isLoading}
+            disabled={validWorkout && isLoading}
             onPress={handleSubmit(onSubmit, onInvalid)}
             theme="green_Button"
           >

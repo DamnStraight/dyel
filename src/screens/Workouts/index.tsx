@@ -2,36 +2,36 @@ import { RootWorkoutStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { H1, Heading, ScrollView, Stack } from "tamagui";
+import { H1, H2, Heading, ScrollView, Stack, YStack } from "tamagui";
 import FAB from "../../components/FAB";
 import { useDatabase } from "../../hooks/useDatabase";
+import { WorkoutModel } from "@App/data/entities/Workout";
+import { useBoundStore } from "../../store";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
+function WorkoutCard({ name }: Pick<WorkoutModel, "name">) {
+  return (
+    <YStack padding={15} borderRadius={15} elevation={5} bg="white" animation="bouncy" height={100} pressStyle={{ height: 200}}>
+      <YStack>
+        <H2 color="black">{name}</H2>
+      </YStack>
+    </YStack>
+  );
+}
+
 // prettier-ignore
 interface WorkoutProps extends NativeStackScreenProps<RootWorkoutStackParamList, "WorkoutScreen"> {}
 
 function WorkoutScreen({ navigation }: WorkoutProps) {
-  const [workouts, setWorkouts] = useState<any[]>([]);
   const [isRefreshing, setRefreshing] = useState<boolean>(false);
-  const { workoutRepository } = useDatabase();
+  const workouts = useBoundStore((state) => state.workouts);
+  const fetchWorkouts = useBoundStore((state) => state.fetchWorkouts);
 
-  useEffect(() => {
-    // Refresh the exercise list whenever the screen comes back into focus
-    const unsubscribe = navigation.addListener("focus", () => {
-      workoutRepository.getAll().then(setWorkouts);
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const onRefresh = useCallback(async () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-
-    const result = await workoutRepository.getAll();
-    setWorkouts(result);
-
+    await fetchWorkouts();
     setRefreshing(false);
-  }, []);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -49,12 +49,16 @@ function WorkoutScreen({ navigation }: WorkoutProps) {
               Workouts
             </H1>
             {workouts.map(({ name }, i) => (
-              <Heading key={i}>{name}</Heading>
+              <WorkoutCard key={`${i}-${name}`} name={name} />
             ))}
           </Stack>
         </Stack>
       </ScrollView>
-      <FAB color="$indigo700" iconColor="white" onPress={() => navigation.navigate("AddWorkoutModal")} />
+      <FAB
+        color="$indigo700"
+        iconColor="white"
+        onPress={() => navigation.navigate("AddWorkoutModal")}
+      />
     </SafeAreaView>
   );
 }
