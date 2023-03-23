@@ -1,10 +1,14 @@
+import { SafeAreaView } from "react-native";
 import {
-  SafeAreaView, StyleSheet
-} from "react-native";
-import {
-  Button, Heading, ScrollView, Stack, Text, XStack,
+  Button,
+  Heading,
+  ScrollView,
+  Stack,
+  Text,
+  XStack,
   YStack
 } from "tamagui";
+import { ScreenHeader } from "../../components/ScreenHeader";
 
 function DashboardScreen() {
   return (
@@ -12,14 +16,14 @@ function DashboardScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <YStack height="100%" p="$4" space="$3">
           <YStack w="100%">
-            <Heading size={"$10"} style={styles.textShadowLarge} color="white">
+            <ScreenHeader size={"$10"} color="white">
               {/* TODO Make this based on the time of day (Good morning, good afternoon, good evening) */}
               Good Morning,
-            </Heading>
-            <Heading size="$10" style={styles.textShadowLarge} color="white">
+            </ScreenHeader>
+            <ScreenHeader size="$10" color="white">
               {/* TODO Allow user to enter name in settings personalization */}
               Steven
-            </Heading>
+            </ScreenHeader>
           </YStack>
           <Stack
             borderRadius={15}
@@ -30,13 +34,9 @@ function DashboardScreen() {
             pressStyle={{ scale: 0.96, bg: "$zinc200" }}
           >
             <YStack space={2}>
-              <Heading style={styles.textShadowSmall}>
-                Your last workout
-              </Heading>
-              <Heading size="$5" style={styles.textShadowSmall}>
-                2022-12-29 - Chest Day
-              </Heading>
-              <Text style={styles.textShadowSmall}>
+              <Heading>Your last workout</Heading>
+              <Heading size="$5">2022-12-29 - Chest Day</Heading>
+              <Text>
                 Bla bla text might go here, like if you did something notable
                 like hit a new PR lift
               </Text>
@@ -93,18 +93,3 @@ function DashboardScreen() {
 }
 
 export default DashboardScreen;
-
-// ─── Styles ────────────────────────────────────────────────────────────── ✣ ─
-
-const styles = StyleSheet.create({
-  textShadowLarge: {
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  textShadowSmall: {
-    textShadowColor: "rgba(0, 0, 0, 0.3)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 2,
-  },
-});

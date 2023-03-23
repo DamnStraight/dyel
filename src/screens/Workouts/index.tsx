@@ -2,10 +2,11 @@ import { WorkoutModel } from "@App/data/entities/Workout";
 import { RootWorkoutStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { H1, H2, ScrollView, Stack, YStack } from "tamagui";
+import { RefreshControl, SafeAreaView } from "react-native";
+import { H2, ScrollView, Stack, YStack } from "tamagui";
 import { ConfirmationDialog } from "../../components/ConfirmationDialog";
 import FAB from "../../components/FAB";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { useBoundStore } from "../../store";
 
 // ─── Component & Props ─────────────────────────────────────────────────── ✣ ─
@@ -70,9 +71,9 @@ function WorkoutScreen({ navigation }: WorkoutProps) {
       >
         <Stack p={5}>
           <Stack w="100%" space="$4">
-            <H1 color="$slate50" size="$12" style={styles.header}>
+            <ScreenHeader>
               Workouts
-            </H1>
+            </ScreenHeader>
             {workouts.map((workout, i) => (
               <Stack
                 key={`${i}-${workout.name}`}
@@ -117,13 +118,3 @@ function WorkoutScreen({ navigation }: WorkoutProps) {
 }
 
 export default WorkoutScreen;
-
-// ─── Styles ────────────────────────────────────────────────────────────── ✣ ─
-
-const styles = StyleSheet.create({
-  header: {
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-});

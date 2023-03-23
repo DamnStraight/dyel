@@ -4,7 +4,8 @@ import { RootExerciseStackParamList } from "@App/Navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { RefreshControl, SafeAreaView, StyleSheet } from "react-native";
-import { H1, H2, ScrollView, Stack, Text, YStack } from "tamagui";
+import { H2, ScrollView, Stack, Text, YStack } from "tamagui";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { useBoundStore } from "../../store";
 import { CreateExerciseModal } from "./CreateExerciseModal";
 
@@ -54,9 +55,9 @@ export default function ExerciseScreen({ navigation }: ExerciseProps) {
           >
             <Stack p={4}>
               <YStack flex={1} space="$4">
-                <H1 color="$slate50" size="$12" style={styles.header}>
+                <ScreenHeader>
                   Exercises
-                </H1>
+                </ScreenHeader>
                 {exercises.map(({ name }, i) => (
                   <ExerciseCard key={`${i}-${name}`} name={name} />
                 ))}
