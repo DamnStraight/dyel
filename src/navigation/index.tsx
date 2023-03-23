@@ -6,18 +6,21 @@ import AddWorkoutModal from "@App/screens/Workouts/AddWorkoutModal";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
   BottomTabScreenProps,
-  createBottomTabNavigator
+  createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import {
   DefaultTheme,
   getFocusedRouteNameFromRoute,
   NavigationContainer,
-  NavigatorScreenParams
+  NavigatorScreenParams,
 } from "@react-navigation/native";
 import {
-  createNativeStackNavigator, NativeStackScreenProps
+  createNativeStackNavigator,
+  NativeStackScreenProps,
 } from "@react-navigation/native-stack";
 import { useLayoutEffect } from "react";
+import { WorkoutModel } from "../data/entities/Workout";
+import ActiveWorkoutModal from "../screens/Workouts/ActiveWorkoutModal";
 
 const NavigationTheme = {
   ...DefaultTheme,
@@ -70,7 +73,14 @@ function WorkoutStackNavigation({
     const routeName = getFocusedRouteNameFromRoute(route);
 
     if (routeName === "AddWorkoutModal") {
-      navigation.setOptions({ tabBarStyle: { display: "none", height: 0, width: 0 , backgroundColor: 'transparent' } });
+      navigation.setOptions({
+        tabBarStyle: {
+          display: "none",
+          height: 0,
+          width: 0,
+          backgroundColor: "transparent",
+        },
+      });
     } else {
       navigation.setOptions({ tabBarStyle: { display: "flex", height: 95 } });
     }
@@ -88,8 +98,13 @@ function WorkoutStackNavigation({
           component={AddWorkoutModal}
           options={{
             title: "Create Workout",
-            headerShown: false
+            headerShown: false,
           }}
+        />
+        <WorkoutStack.Screen
+          name={"ActiveWorkoutModal"}
+          component={ActiveWorkoutModal}
+          options={{ presentation: "modal" }}
         />
       </WorkoutStack.Group>
     </WorkoutStack.Navigator>
@@ -118,7 +133,7 @@ export default function RootNavigation() {
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="tachometer-alt" size={size} color={color} />
               ),
-              unmountOnBlur: true
+              unmountOnBlur: true,
             }}
             name="Dashboard"
             component={DashboardScreen}
@@ -129,7 +144,7 @@ export default function RootNavigation() {
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="dumbbell" size={size} color={color} />
               ),
-              unmountOnBlur: true
+              unmountOnBlur: true,
             }}
             name="Exercises"
             component={ExerciseStackNavigation}
@@ -139,7 +154,7 @@ export default function RootNavigation() {
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="running" size={size} color={color} />
               ),
-              unmountOnBlur: true
+              unmountOnBlur: true,
             }}
             name="Workouts"
             component={WorkoutStackNavigation}

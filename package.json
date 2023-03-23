@@ -21,6 +21,7 @@
     "@types/react": "~18.0.27",
     "@types/react-native": "~0.70.6",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
+    "dayjs": "^1.11.7",
     "expo": "^48.0.6",
     "expo-font": "^11.1.1",
     "expo-sqlite": "~11.1.1",
