@@ -20,8 +20,10 @@ export class ExerciseModel {
   @Column()
   name: string;
 
-  @OneToMany("ExerciseSetModel", "exercise", { lazy: true })
-  exerciseSets: Promise<ExerciseSetModel[]>;
+  @OneToMany("ExerciseSetModel", "exercise", { eager: true })
+  exerciseSets: ExerciseSetModel[];
+  // @OneToMany("ExerciseSetModel", "exercise", { lazy: true })
+  // exerciseSets: Promise<ExerciseSetModel[]>;
 
   @ManyToMany("WorkoutModel", "exercises", { lazy: true, cascade: true })
   workouts: Promise<WorkoutModel[]>;

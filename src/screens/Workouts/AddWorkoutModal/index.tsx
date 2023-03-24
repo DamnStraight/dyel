@@ -71,7 +71,7 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
   };
 
   const saveWorkout = async (formData: AddWorkoutFormValues) => {
-    const { workoutName, exercises } = formData;
+    const { workoutName, exercises: formExercises } = formData;
     try {
       // Create the new workout
       let workoutEntity = await workoutRepository.create(
@@ -80,7 +80,7 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
       );
 
       // Create and store the sets linked to both the workout and the exercise (Cascade)
-      const exerciseSetEntities = exercises.flatMap((exercise, _) => [
+      const exerciseSetEntities = formExercises.flatMap((exercise, _) => [
         ...exercise.exerciseSets.map((set, index) => ({
           ...set,
           exercise: { ...exercise, workouts: [workoutEntity] },
@@ -94,6 +94,7 @@ function AddWorkoutModal({ navigation, route }: AddWorkoutProps) {
       );
 
       workoutEntity.sets = savedSetEntities;
+      workoutEntity.exercises = exercises
       workoutEntity = await workoutRepository.save(workoutEntity);
 
       await addWorkout(workoutEntity);

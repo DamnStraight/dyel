@@ -16,9 +16,8 @@ const formatTime = (timer: number) => {
 function createInitialTimer() {
   const activeWorkout = useBoundStore.getState().activeWorkout;
 
-  const startTime = dayjs(activeWorkout.startTime);
-  // NOTE Adding 3 hours for dev purposes, remove this eventually
-  const now = dayjs().add(3, "hours");
+  const startTime = dayjs(activeWorkout?.startTime);
+  const now = dayjs();
 
   const seconds = now.diff(startTime, "seconds");
 

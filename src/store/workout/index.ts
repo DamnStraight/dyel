@@ -8,7 +8,7 @@ export type ActiveWorkout = {
 }
 
 export type WorkoutSlice = {
-  activeWorkout?: any;
+  activeWorkout?: ActiveWorkout;
   workouts: WorkoutModel[];
   setActiveWorkout: (workout: ActiveWorkout) => void;
   setWorkouts: (workouts: WorkoutModel[]) => void;

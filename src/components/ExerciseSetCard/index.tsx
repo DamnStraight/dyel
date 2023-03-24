@@ -137,8 +137,8 @@ const ExerciseSetCard = ({
                 textAlign="center"
                 flex={0.33}
                 onChangeText={onChange}
-                value={value}
-                defaultValue={item.weight}
+                value={String(value)}
+                defaultValue={String(item.weight)}
                 placeholder={"0"}
               />
             )}
@@ -154,8 +154,8 @@ const ExerciseSetCard = ({
                 textAlign="center"
                 flex={0.33}
                 onChangeText={onChange}
-                value={value}
-                defaultValue={item.reps}
+                value={String(value)}
+                defaultValue={String(item.reps)}
                 placeholder={"0"}
               />
             )}
